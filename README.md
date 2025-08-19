@@ -1,97 +1,230 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🌟 FocusLife App
 
-# Getting Started
+A comprehensive Todo Management, Sleep Tracking, Digital Wellness, and Gamified Rewards app built with React Native.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## ✨ Features
 
-## Step 1: Start Metro
+### 📋 Todo Management
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- **Smart Task Organization**: Create, edit, and organize tasks with priority levels
+- **Filtering System**: Filter tasks by all, today, or high priority
+- **Progress Tracking**: Visual progress indicators and completion statistics
+- **Due Date Management**: Set deadlines and get timely reminders
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### ⏰ Focus Timer (Pomodoro)
 
-```sh
-# Using npm
-npm start
+- **Pomodoro Technique**: 25-minute focus sessions with 5-minute breaks
+- **Session Management**: Track multiple sessions with progress indicators
+- **Break Management**: Automatic break timers with skip options
+- **Focus Statistics**: Daily and weekly focus time tracking
 
-# OR using Yarn
-yarn start
+### 😴 Sleep Tracking
+
+- **Sleep Quality Monitoring**: Track sleep duration, quality, and patterns
+- **Detailed Analytics**: Deep sleep, REM sleep, and sleep cycle analysis
+- **Weekly Trends**: Visual charts showing sleep patterns over time
+- **Sleep Streaks**: Gamified sleep consistency tracking
+
+### 🏆 Gamified Rewards
+
+- **Forest Building**: Grow a virtual forest based on good sleep habits
+- **City Development**: Build a city through focus and productivity
+- **Achievement System**: Unlock badges and rewards for consistent habits
+- **Progress Visualization**: Beautiful visual representations of your progress
+
+### 📊 Digital Wellness
+
+- **Screen Time Tracking**: Monitor and limit daily screen usage
+- **Wellness Insights**: Personalized tips and recommendations
+- **Habit Streaks**: Track consistency across all wellness metrics
+- **Motivational Content**: Encouraging messages and progress celebrations
+
+## 🎨 Design Features
+
+- **Modern UI/UX**: Clean, intuitive interface with smooth animations
+- **Dark Mode Support**: Automatic theme switching based on system preferences
+- **Gradient Design**: Beautiful gradient backgrounds and progress indicators
+- **Responsive Layout**: Optimized for various screen sizes
+- **Accessibility**: Built with accessibility best practices
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- React Native CLI
+- iOS Simulator (for iOS development)
+- Android Studio (for Android development)
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd ZenFlow
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **iOS Setup** (macOS only)
+
+   ```bash
+   cd ios
+   pod install
+   cd ..
+   ```
+
+4. **Start the development server**
+
+   ```bash
+   npm start
+   ```
+
+5. **Run on iOS**
+
+   ```bash
+   npm run ios
+   ```
+
+6. **Run on Android**
+   ```bash
+   npm run android
+   ```
+
+## 📱 App Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ProgressBar.tsx
+│   └── StatCard.tsx
+├── screens/            # Main app screens
+│   ├── DashboardScreen.tsx
+│   ├── TodoScreen.tsx
+│   ├── TimerScreen.tsx
+│   ├── SleepScreen.tsx
+│   └── RewardsScreen.tsx
+├── types/              # TypeScript type definitions
+│   └── index.ts
+└── utils/              # Utility functions
+    └── helpers.ts
 ```
 
-## Step 2: Build and run your app
+## 🛠️ Technologies Used
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+- **React Native**: Cross-platform mobile development
+- **TypeScript**: Type-safe JavaScript development
+- **React Navigation**: Navigation between screens
+- **React Native Vector Icons**: Beautiful icon library
+- **React Native Linear Gradient**: Gradient backgrounds
+- **React Native Safe Area Context**: Safe area handling
 
-### Android
+## 📊 Key Components
 
-```sh
-# Using npm
-npm run android
+### Dashboard Screen
 
-# OR using Yarn
-yarn android
-```
+- Daily overview with greeting
+- Quick stats (sleep, screen time, focus)
+- Progress indicators
+- Quick action buttons
 
-### iOS
+### Todo Screen
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+- Task list with priority indicators
+- Filter tabs (All, Today, High Priority)
+- Checkbox interactions
+- Task completion tracking
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+### Timer Screen
 
-```sh
-bundle install
-```
+- Pomodoro timer with play/pause
+- Session progress tracking
+- Break management
+- Focus time statistics
 
-Then, and every time you update your native dependencies, run:
+### Sleep Screen
 
-```sh
-bundle exec pod install
-```
+- Sleep quality metrics
+- Duration and timing details
+- Weekly sleep charts
+- Sleep tips and recommendations
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### Rewards Screen
 
-```sh
-# Using npm
-npm run ios
+- Forest and city visualizations
+- Achievement system
+- Progress bars for all metrics
+- Next reward indicators
 
-# OR using Yarn
-yarn ios
-```
+## 🎯 Usage Guide
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Getting Started
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+1. Open the app and explore the dashboard
+2. Add your first task in the Todo section
+3. Start a focus session using the Timer
+4. Log your sleep data in the Sleep section
+5. Check your progress and rewards
 
-## Step 3: Modify your app
+### Best Practices
 
-Now that you have successfully run the app, let's make changes!
+- **Consistent Sleep**: Try to maintain regular sleep patterns
+- **Focused Work**: Use the Pomodoro timer for deep work sessions
+- **Task Management**: Prioritize tasks and complete them systematically
+- **Digital Wellness**: Monitor and limit screen time for better health
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## 🔧 Customization
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### Colors and Themes
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+The app uses a consistent color palette:
 
-## Congratulations! :tada:
+- Primary: `#4f46e5` (Indigo)
+- Secondary: `#7c3aed` (Purple)
+- Success: `#10b981` (Green)
+- Warning: `#f59e0b` (Yellow)
+- Error: `#dc2626` (Red)
 
-You've successfully run and modified your React Native App. :partying_face:
+### Adding New Features
 
-### Now what?
+1. Create new components in `src/components/`
+2. Add new screens in `src/screens/`
+3. Update types in `src/types/index.ts`
+4. Add utility functions in `src/utils/helpers.ts`
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## 📈 Future Enhancements
 
-# Troubleshooting
+- [ ] Cloud synchronization
+- [ ] Social features and sharing
+- [ ] Advanced analytics and insights
+- [ ] Customizable themes
+- [ ] Push notifications
+- [ ] Integration with health apps
+- [ ] Export and backup functionality
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## 🤝 Contributing
 
-# Learn More
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-To learn more about React Native, take a look at the following resources:
+## 📄 License
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Inspired by productivity and wellness apps like Forest, Headspace, and Todoist
+- Built with modern React Native best practices
+- Designed for optimal user experience and engagement
+
+---
+
+**FocusLife** - Transform your daily habits into a beautiful, productive life! 🌟
