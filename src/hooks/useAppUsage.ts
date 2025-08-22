@@ -72,28 +72,6 @@ export const useAppUsage = () => {
     }
   }, []);
 
-  const loadMonthlyData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log(`📱 Loading monthly usage data...`);
-      const data = await appUsageService.getMonthlyUsageData();
-      console.log(`📱 Received ${data.length} monthly data points`);
-      const totalUsage = data.reduce((sum, item) => sum + item.usageTime, 0);
-      console.log(
-        `📱 Total monthly usage: ${totalUsage} minutes (${(
-          totalUsage / 60
-        ).toFixed(1)} hours)`,
-      );
-      setUsageData(data);
-    } catch (err) {
-      setError('Failed to load monthly data');
-      console.error('Error loading monthly data:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   const loadInsights = useCallback(async () => {
     try {
       setLoading(true);
@@ -162,7 +140,7 @@ export const useAppUsage = () => {
   useEffect(() => {
     loadUsageData();
     loadInsights();
-  }, [loadUsageData, loadInsights]);
+  }, []); // Only run once on mount
 
   return {
     isTracking,
@@ -173,7 +151,6 @@ export const useAppUsage = () => {
     startTracking,
     stopTracking,
     loadUsageData,
-    loadMonthlyData,
     loadInsights,
     getPhoneUsageImpact,
     requestPermissions,

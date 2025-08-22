@@ -274,6 +274,21 @@ class NotificationService {
    */
   async scheduleMultipleTaskNotifications(tasks: Todo[]) {
     try {
+      console.log(`🔔 Scheduling notifications for ${tasks.length} tasks`);
+
+      // Log Google Calendar tasks specifically
+      const calendarTasks = tasks.filter(task => task.isFromCalendar);
+      if (calendarTasks.length > 0) {
+        console.log(
+          `📅 Processing ${calendarTasks.length} Google Calendar tasks:`,
+          calendarTasks.map(t => ({
+            title: t.title,
+            startAt: t.startAt,
+            calendarEventId: t.calendarEventId,
+          })),
+        );
+      }
+
       for (const task of tasks) {
         await this.scheduleTaskNotifications(task);
       }

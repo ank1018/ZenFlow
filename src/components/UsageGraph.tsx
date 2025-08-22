@@ -14,8 +14,6 @@ const { width } = Dimensions.get('window');
 
 interface UsageGraphProps {
   data: AppUsageData[];
-  viewMode: 'daily' | 'monthly';
-  onViewModeChange: (mode: 'daily' | 'monthly') => void;
 }
 
 interface DayData {
@@ -29,11 +27,7 @@ interface DayData {
   };
 }
 
-const UsageGraph: React.FC<UsageGraphProps> = ({
-  data,
-  viewMode,
-  onViewModeChange,
-}) => {
+const UsageGraph: React.FC<UsageGraphProps> = ({ data }) => {
   const [selectedBar, setSelectedBar] = useState<number | null>(null);
 
   // Process data for graph - memoized to prevent recalculation
@@ -91,56 +85,8 @@ const UsageGraph: React.FC<UsageGraphProps> = ({
       ).toFixed(1)} hours)`,
     );
 
-    // For monthly view, show weekly averages
-    if (viewMode === 'monthly' && sortedData.length > 7) {
-      const weeklyData: DayData[] = [];
-      const weeks = Math.ceil(sortedData.length / 7);
-
-      for (let i = 0; i < weeks; i++) {
-        const weekStart = i * 7;
-        const weekEnd = Math.min(weekStart + 7, sortedData.length);
-        const weekDays = sortedData.slice(weekStart, weekEnd);
-
-        if (weekDays.length > 0) {
-          const avgUsage =
-            weekDays.reduce((sum, day) => sum + day.totalUsage, 0) /
-            weekDays.length;
-          const avgCategories = {
-            social:
-              weekDays.reduce((sum, day) => sum + day.categories.social, 0) /
-              weekDays.length,
-            entertainment:
-              weekDays.reduce(
-                (sum, day) => sum + day.categories.entertainment,
-                0,
-              ) / weekDays.length,
-            productivity:
-              weekDays.reduce(
-                (sum, day) => sum + day.categories.productivity,
-                0,
-              ) / weekDays.length,
-            health:
-              weekDays.reduce((sum, day) => sum + day.categories.health, 0) /
-              weekDays.length,
-            other:
-              weekDays.reduce((sum, day) => sum + day.categories.other, 0) /
-              weekDays.length,
-          };
-
-          weeklyData.push({
-            date: weekDays[0].date,
-            totalUsage: Math.round(avgUsage),
-            categories: avgCategories,
-            apps: {},
-          });
-        }
-      }
-
-      return weeklyData.slice(-8); // Show last 8 weeks
-    }
-
     return sortedData.slice(-7); // Show last 7 days
-  }, [data, viewMode]);
+  }, [data]);
 
   const maxUsage = Math.max(...processedData.map(d => d.totalUsage), 1);
 
@@ -202,20 +148,11 @@ const UsageGraph: React.FC<UsageGraphProps> = ({
     if (isToday) return 'Today';
     if (isYesterday) return 'Yesterday';
 
-    if (viewMode === 'daily') {
-      return date.toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-      });
-    } else {
-      const weekNumber = Math.ceil(
-        (date.getDate() +
-          new Date(date.getFullYear(), date.getMonth(), 1).getDay()) /
-          7,
-      );
-      return `Week ${weekNumber}`;
-    }
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
   const getUsageStatus = (usage: number) => {
@@ -446,41 +383,6 @@ const UsageGraph: React.FC<UsageGraphProps> = ({
   if (processedData.length === 0) {
     return (
       <View style={styles.container}>
-        <View style={styles.viewModeContainer}>
-          <TouchableOpacity
-            style={[
-              styles.viewModeButton,
-              viewMode === 'daily' && styles.activeViewModeButton,
-            ]}
-            onPress={() => onViewModeChange('daily')}
-          >
-            <Text
-              style={[
-                styles.viewModeText,
-                viewMode === 'daily' && styles.activeViewModeText,
-              ]}
-            >
-              Daily
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.viewModeButton,
-              viewMode === 'monthly' && styles.activeViewModeButton,
-            ]}
-            onPress={() => onViewModeChange('monthly')}
-          >
-            <Text
-              style={[
-                styles.viewModeText,
-                viewMode === 'monthly' && styles.activeViewModeText,
-              ]}
-            >
-              Monthly
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIconContainer}>
             <Icon name="chart-line-variant" size={64} color="#E5E7EB" />
@@ -499,60 +401,8 @@ const UsageGraph: React.FC<UsageGraphProps> = ({
       {/* Enhanced Header */}
       <View style={styles.headerSection}>
         <View style={styles.headerLeft}>
-          <Text style={styles.sectionTitle}>Usage Patterns</Text>
-          <Text style={styles.sectionSubtitle}>
-            {viewMode === 'daily' ? 'Past 7 days' : 'Weekly overview'}
-          </Text>
-        </View>
-
-        {/* View Mode Toggle */}
-        <View style={styles.viewModeContainer}>
-          <TouchableOpacity
-            style={[
-              styles.viewModeButton,
-              viewMode === 'daily' && styles.activeViewModeButton,
-            ]}
-            onPress={() => onViewModeChange('daily')}
-            activeOpacity={0.7}
-          >
-            <Icon
-              name="calendar-today"
-              size={14}
-              color={viewMode === 'daily' ? '#6366F1' : '#9CA3AF'}
-              style={{ marginRight: 4 }}
-            />
-            <Text
-              style={[
-                styles.viewModeText,
-                viewMode === 'daily' && styles.activeViewModeText,
-              ]}
-            >
-              Daily
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.viewModeButton,
-              viewMode === 'monthly' && styles.activeViewModeButton,
-            ]}
-            onPress={() => onViewModeChange('monthly')}
-            activeOpacity={0.7}
-          >
-            <Icon
-              name="calendar-month"
-              size={14}
-              color={viewMode === 'monthly' ? '#6366F1' : '#9CA3AF'}
-              style={{ marginRight: 4 }}
-            />
-            <Text
-              style={[
-                styles.viewModeText,
-                viewMode === 'monthly' && styles.activeViewModeText,
-              ]}
-            >
-              Monthly
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Daily Usage Patterns</Text>
+          <Text style={styles.sectionSubtitle}>Past 7 days of screen time</Text>
         </View>
       </View>
 
@@ -662,37 +512,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
   },
-  viewModeContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
-    borderRadius: 12,
-    padding: 3,
-  },
-  viewModeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 9,
-    minWidth: 80,
-    justifyContent: 'center',
-  },
-  activeViewModeButton: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  viewModeText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#9CA3AF',
-  },
-  activeViewModeText: {
-    color: '#6366F1',
-  },
+
   graphContainer: {
     paddingHorizontal: 24,
     marginBottom: 20,

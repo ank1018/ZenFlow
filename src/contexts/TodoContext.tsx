@@ -60,7 +60,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
       setTodos(prev => [...prev, newTodo]);
 
       // Schedule notifications for the new task
-      if (newTodo && newTodo.startTime) {
+      if (newTodo && newTodo.startAt) {
         await NotificationService.scheduleTaskNotifications(newTodo);
       }
 
@@ -172,9 +172,18 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
       setTodos(reloadedTodos);
 
       // Schedule notifications for all tasks with start times
-      const tasksWithStartTimes = reloadedTodos.filter(todo => todo.startTime);
+      const tasksWithStartTimes = reloadedTodos.filter(todo => todo.startAt);
       if (tasksWithStartTimes.length > 0) {
         console.log(`🔔 Scheduling notifications for ${tasksWithStartTimes.length} tasks with start times`);
+        
+        // Log Google Calendar tasks specifically
+        const calendarTasks = tasksWithStartTimes.filter(todo => todo.isFromCalendar);
+        if (calendarTasks.length > 0) {
+          console.log(`📅 Found ${calendarTasks.length} Google Calendar tasks with start times:`, 
+            calendarTasks.map(t => ({ title: t.title, startAt: t.startAt, calendarEventId: t.calendarEventId }))
+          );
+        }
+        
         await NotificationService.scheduleMultipleTaskNotifications(tasksWithStartTimes);
       }
 
@@ -246,7 +255,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
   // Schedule notifications for all tasks when todos are loaded
   useEffect(() => {
     if (todos.length > 0 && !loading) {
-      const tasksWithStartTimes = todos.filter(todo => todo.startTime);
+      const tasksWithStartTimes = todos.filter(todo => todo.startAt);
       if (tasksWithStartTimes.length > 0) {
         console.log(`🔔 Initializing notifications for ${tasksWithStartTimes.length} existing tasks`);
         NotificationService.scheduleMultipleTaskNotifications(tasksWithStartTimes);

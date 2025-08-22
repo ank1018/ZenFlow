@@ -55,14 +55,14 @@ class NativeNotificationService {
         triggerTime: triggerTime.toISOString(),
         triggerTimeMs: triggerTime.getTime(),
       });
-
+      
       const result = await this.module.scheduleNotification(
         notificationId,
         title,
         message,
         triggerTime.getTime(),
       );
-
+      
       console.log('📱 Native notification scheduled result:', result);
       return result;
     } catch (error) {

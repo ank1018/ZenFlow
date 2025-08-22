@@ -12,9 +12,6 @@ import {
   Animated,
   Platform,
 } from 'react-native';
-import NotificationService from '../../services/NotificationService';
-import NativeNotificationService from '../../services/NativeNotificationService';
-// import DateTimePicker from '@react-native-community/datetimepicker';
 
 // Custom DateTimePicker component
 const CustomDateTimePicker: React.FC<{
@@ -758,6 +755,8 @@ const TodoScreen: React.FC = () => {
               <Text style={[styles.greeting, isDarkMode && styles.darkText]}>
                 {getGreeting()}
               </Text>
+            </View>
+            <View style={styles.headerActions}>
               <TouchableOpacity
                 style={[
                   styles.todayButton,
@@ -787,8 +786,6 @@ const TodoScreen: React.FC = () => {
                   Today
                 </Text>
               </TouchableOpacity>
-            </View>
-            <View style={styles.headerActions}>
               <CalendarSyncButton />
               {/* <TouchableOpacity
                 style={[

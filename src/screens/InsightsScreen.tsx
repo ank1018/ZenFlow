@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,12 +19,8 @@ import UsageGraph from '../components/UsageGraph';
 const { width } = Dimensions.get('window');
 
 const InsightsScreen = () => {
-  const [viewMode, setViewMode] = useState<'daily' | 'monthly'>('daily');
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
-  const [selectedTimeframe, setSelectedTimeframe] = useState<
-    'today' | 'week' | 'month'
-  >('today');
 
   const {
     usageData,
@@ -33,7 +29,6 @@ const InsightsScreen = () => {
     checkPermissions,
     loading,
     loadUsageData,
-    loadMonthlyData,
   } = useAppUsage();
   const [insights, setInsights] = useState<any>(null);
   const [permissionStatus, setPermissionStatus] = useState<any>(null);
@@ -55,6 +50,11 @@ const InsightsScreen = () => {
 
     loadInsights();
   }, [usageData]);
+
+  // Load usage data on mount
+  useEffect(() => {
+    loadUsageData(7); // Load 7 days for the graph
+  }, []);
 
   // Check permissions on mount
   useEffect(() => {
@@ -138,23 +138,67 @@ const InsightsScreen = () => {
     }
   };
 
-  const handleViewModeChange = async (mode: 'daily' | 'monthly') => {
-    if (mode === viewMode) return; // Prevent unnecessary reloads
+  // Process and aggregate usage data for today only
+  const processedUsageData = useMemo(() => {
+    const appMap = new Map<
+      string,
+      { appName: string; usageTime: number; category: string }
+    >();
 
-    console.log(`🔄 Switching to ${mode} view`);
-    setViewMode(mode);
-    if (mode === 'daily') {
-      await loadUsageData(7);
-    } else {
-      await loadMonthlyData();
-    }
-  };
+    const today = new Date().toISOString().split('T')[0];
+    console.log('📅 Processing data for today:', today);
 
-  // Calculate real data from usageData
-  const totalUsage = usageData.reduce((sum, app) => sum + app.usageTime, 0);
-  const healthyUsage = usageData
-    .filter(app => app.category === 'health')
-    .reduce((sum, app) => sum + app.usageTime, 0);
+    // Only process today's data for stats
+    usageData.forEach(item => {
+      const itemDate = new Date(item.date).toISOString().split('T')[0];
+      if (itemDate === today) {
+        const key = item.appName;
+        if (appMap.has(key)) {
+          const existing = appMap.get(key)!;
+          existing.usageTime += item.usageTime;
+        } else {
+          appMap.set(key, {
+            appName: item.appName,
+            usageTime: item.usageTime,
+            category: item.category,
+          });
+        }
+      }
+    });
+
+    const result = Array.from(appMap.values());
+    const totalToday = result.reduce((sum, app) => sum + app.usageTime, 0);
+    console.log(
+      `📊 Today's processed data: ${
+        result.length
+      } apps, total usage: ${totalToday} minutes (${(totalToday / 60).toFixed(
+        1,
+      )} hours)`,
+    );
+
+    return result;
+  }, [usageData]);
+
+  // Calculate real data from processed usage data
+  const totalUsage = processedUsageData.reduce(
+    (
+      sum: number,
+      app: { appName: string; usageTime: number; category: string },
+    ) => sum + app.usageTime,
+    0,
+  );
+  const healthyUsage = processedUsageData
+    .filter(
+      (app: { appName: string; usageTime: number; category: string }) =>
+        app.category === 'health',
+    )
+    .reduce(
+      (
+        sum: number,
+        app: { appName: string; usageTime: number; category: string },
+      ) => sum + app.usageTime,
+      0,
+    );
   const wellnessScore =
     totalUsage > 0 ? Math.round((healthyUsage / totalUsage) * 100) : 0;
 
@@ -162,9 +206,15 @@ const InsightsScreen = () => {
   const categoryData = [
     {
       name: 'Health & Wellness',
-      value: usageData
+      value: processedUsageData
         .filter(app => app.category === 'health')
-        .reduce((sum, app) => sum + app.usageTime, 0),
+        .reduce(
+          (
+            sum: number,
+            app: { appName: string; usageTime: number; category: string },
+          ) => sum + app.usageTime,
+          0,
+        ),
       color: '#34D399',
       gradient: ['#34D399', '#10B981'],
       icon: 'heart-pulse',
@@ -172,9 +222,15 @@ const InsightsScreen = () => {
     },
     {
       name: 'Productivity',
-      value: usageData
+      value: processedUsageData
         .filter(app => app.category === 'productivity')
-        .reduce((sum, app) => sum + app.usageTime, 0),
+        .reduce(
+          (
+            sum: number,
+            app: { appName: string; usageTime: number; category: string },
+          ) => sum + app.usageTime,
+          0,
+        ),
       color: '#60A5FA',
       gradient: ['#60A5FA', '#3B82F6'],
       icon: 'rocket-launch',
@@ -182,9 +238,15 @@ const InsightsScreen = () => {
     },
     {
       name: 'Social Media',
-      value: usageData
+      value: processedUsageData
         .filter(app => app.category === 'social')
-        .reduce((sum, app) => sum + app.usageTime, 0),
+        .reduce(
+          (
+            sum: number,
+            app: { appName: string; usageTime: number; category: string },
+          ) => sum + app.usageTime,
+          0,
+        ),
       color: '#FBBF24',
       gradient: ['#FBBF24', '#F59E0B'],
       icon: 'account-group',
@@ -192,9 +254,15 @@ const InsightsScreen = () => {
     },
     {
       name: 'Entertainment',
-      value: usageData
+      value: processedUsageData
         .filter(app => app.category === 'entertainment')
-        .reduce((sum, app) => sum + app.usageTime, 0),
+        .reduce(
+          (
+            sum: number,
+            app: { appName: string; usageTime: number; category: string },
+          ) => sum + app.usageTime,
+          0,
+        ),
       color: '#A78BFA',
       gradient: ['#A78BFA', '#8B5CF6'],
       icon: 'movie-play',
@@ -202,9 +270,15 @@ const InsightsScreen = () => {
     },
     {
       name: 'Other',
-      value: usageData
+      value: processedUsageData
         .filter(app => app.category === 'other')
-        .reduce((sum, app) => sum + app.usageTime, 0),
+        .reduce(
+          (
+            sum: number,
+            app: { appName: string; usageTime: number; category: string },
+          ) => sum + app.usageTime,
+          0,
+        ),
       color: '#9CA3AF',
       gradient: ['#9CA3AF', '#6B7280'],
       icon: 'apps',
@@ -355,11 +429,7 @@ const InsightsScreen = () => {
 
         {/* Usage Graph with enhanced styling */}
         <View style={styles.graphSection}>
-          <UsageGraph
-            data={usageData}
-            viewMode={viewMode}
-            onViewModeChange={handleViewModeChange}
-          />
+          <UsageGraph data={usageData} />
         </View>
 
         {/* Enhanced Wellness Score Card */}
@@ -420,9 +490,9 @@ const InsightsScreen = () => {
                 <Icon name="clock-outline" size={24} color="#3B82F6" />
               </View>
               <View style={styles.statContent}>
-                <Text style={styles.statLabel}>Screen Time</Text>
+                <Text style={styles.statLabel}>Today's Screen Time</Text>
                 <Text style={styles.statValue}>{formatTime(totalUsage)}</Text>
-                <Text style={styles.statSubtext}>Today's total usage</Text>
+                <Text style={styles.statSubtext}>Total usage today</Text>
               </View>
               <View style={styles.statIndicator}>
                 <Icon name="trending-up" size={16} color="#10B981" />
@@ -434,10 +504,11 @@ const InsightsScreen = () => {
                 <Icon name="heart" size={24} color="#10B981" />
               </View>
               <View style={styles.statContent}>
-                <Text style={styles.statLabel}>Wellness Time</Text>
+                <Text style={styles.statLabel}>Today's Wellness Time</Text>
                 <Text style={styles.statValue}>{formatTime(healthyUsage)}</Text>
                 <Text style={styles.statSubtext}>
-                  {Math.round((healthyUsage / totalUsage) * 100)}% of total time
+                  {Math.round((healthyUsage / totalUsage) * 100)}% of today's
+                  time
                 </Text>
               </View>
             </View>
@@ -448,8 +519,10 @@ const InsightsScreen = () => {
         {categoryData.length > 0 && (
           <View style={styles.categoryCard}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Usage Breakdown</Text>
-              <Text style={styles.cardSubtitle}>How you spent your time</Text>
+              <Text style={styles.cardTitle}>Today's Usage Breakdown</Text>
+              <Text style={styles.cardSubtitle}>
+                How you spent your time today
+              </Text>
             </View>
 
             <View style={styles.categoryList}>
@@ -510,17 +583,17 @@ const InsightsScreen = () => {
         )}
 
         {/* Enhanced Top Apps */}
-        {usageData.length > 0 && (
+        {processedUsageData.length > 0 && (
           <View style={styles.appsCard}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Top Apps</Text>
+              <Text style={styles.cardTitle}>Today's Top Apps</Text>
               <Text style={styles.cardSubtitle}>
-                Your most used applications
+                Your most used applications today
               </Text>
             </View>
 
             <View style={styles.appsList}>
-              {usageData
+              {processedUsageData
                 .sort((a, b) => b.usageTime - a.usageTime)
                 .slice(0, 5)
                 .map((app, index) => (
@@ -642,7 +715,7 @@ const InsightsScreen = () => {
         )}
 
         {/* Enhanced Empty State */}
-        {usageData.length === 0 && !loading && (
+        {processedUsageData.length === 0 && !loading && (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconContainer}>
               <Icon name="chart-line-variant" size={80} color="#E5E7EB" />

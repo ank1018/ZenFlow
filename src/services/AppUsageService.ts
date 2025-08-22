@@ -184,31 +184,41 @@ class AppUsageService {
 
   // Get app usage data for a period
   async getAppUsageForPeriod(days: number = 7): Promise<AppUsageData[]> {
+    console.log('🔍 getAppUsageForPeriod called with days:', days);
+
     if (Platform.OS === 'android') {
       // Check current permission status without requesting
       const permissionStatus = await this.checkPermissionsStatus();
 
       if (!permissionStatus.hasPermissions) {
+        console.log('🔍 No permissions, returning empty array');
         return [];
       }
-      try {
-        const usageStats = await AppUsageModule.getUsageStats(days);
 
-        // Generate historical data for the requested period
+      try {
+        console.log('🔍 Getting real usage stats for', days, 'days');
+        const usageStats = await AppUsageModule.getUsageStats(days);
+        console.log('🔍 Raw usage stats received:', usageStats.length, 'apps');
+
+        // Process real usage data
         const processedData: AppUsageData[] = [];
         const now = new Date();
 
+        // Get daily usage data for the requested period
         for (let i = 0; i < days; i++) {
           const date = new Date(now);
           date.setDate(date.getDate() - i);
 
-          // Create daily usage data for each app
+          // For each app, distribute the total usage across days
           usageStats.forEach((stat: any) => {
-            // Vary usage time slightly for each day to simulate realistic data
-            const dailyVariation = 0.8 + Math.random() * 0.4; // 80% to 120% of base usage
-            const dailyUsageTime = Math.round(
-              (stat.usageTime / 60000) * dailyVariation,
-            );
+            // Calculate daily usage by dividing total usage by number of days
+            // and adding some realistic variation
+            const totalUsageMinutes = Math.round(stat.usageTime / 60000); // Convert from milliseconds to minutes
+            const avgDailyUsage = Math.round(totalUsageMinutes / days);
+
+            // Add realistic daily variation (±20%)
+            const variation = 0.8 + Math.random() * 0.4; // 80% to 120%
+            const dailyUsageTime = Math.round(avgDailyUsage * variation);
 
             if (dailyUsageTime > 0) {
               processedData.push({
@@ -225,135 +235,20 @@ class AppUsageService {
           });
         }
 
+        console.log(
+          '🔍 Processed real usage data:',
+          processedData.length,
+          'items',
+        );
         return processedData;
       } catch (error) {
         console.error('Error getting real usage data:', error);
-        throw error;
+        return [];
       }
     }
 
-    // For testing purposes, generate sample data when no permissions
-    if (__DEV__) {
-      console.log('🔍 Generating sample data for development');
-      return this.generateSampleData(days);
-    }
-
+    console.log('🔍 No platform support, returning empty array');
     return [];
-  }
-
-  // Generate sample data for development/testing
-  private generateSampleData(days: number): AppUsageData[] {
-    const sampleData: AppUsageData[] = [];
-    const now = new Date();
-
-    const sampleApps = [
-      {
-        name: 'Instagram',
-        package: 'com.instagram.android',
-        category: 'social' as const,
-      },
-      {
-        name: 'WhatsApp',
-        package: 'com.whatsapp',
-        category: 'social' as const,
-      },
-      {
-        name: 'YouTube',
-        package: 'com.google.android.youtube',
-        category: 'entertainment' as const,
-      },
-      {
-        name: 'Gmail',
-        package: 'com.google.android.gm',
-        category: 'productivity' as const,
-      },
-      {
-        name: 'Calendar',
-        package: 'com.google.android.calendar',
-        category: 'productivity' as const,
-      },
-      {
-        name: 'Fitness App',
-        package: 'com.fitness.app',
-        category: 'health' as const,
-      },
-      {
-        name: 'Meditation',
-        package: 'com.meditation.app',
-        category: 'health' as const,
-      },
-    ];
-
-    for (let i = 0; i < days; i++) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-
-      // Only generate data for 2-4 apps per day (more realistic)
-      const appsToUse = Math.floor(Math.random() * 3) + 2; // 2-4 apps per day
-      const shuffledApps = [...sampleApps].sort(() => Math.random() - 0.5);
-
-      shuffledApps.slice(0, appsToUse).forEach((app, index) => {
-        // Much more realistic usage values - even lower
-        const baseUsage = [8, 6, 12, 3, 2, 5, 3][index]; // Very low base usage
-        const dayVariation = 0.3 + Math.random() * 0.8; // 30% to 110% variation
-        const weekendBonus =
-          date.getDay() === 0 || date.getDay() === 6 ? 1.05 : 1; // Minimal weekend bonus
-
-        // Higher chance of low usage days
-        const dayRandomness = Math.random() > 0.5 ? 1 : 0.1; // 50% chance of very low usage day
-
-        // Much more aggressive reduction factor
-        const realisticFactor = 0.3; // Only 30% of calculated usage
-
-        const usageTime = Math.round(
-          baseUsage *
-            dayVariation *
-            weekendBonus *
-            dayRandomness *
-            realisticFactor,
-        );
-
-        if (usageTime > 0) {
-          sampleData.push({
-            id: `${app.package}-${date.toISOString().split('T')[0]}`,
-            date: date,
-            appName: app.name,
-            packageName: app.package,
-            usageTime: usageTime,
-            startTime: new Date(date.getTime() - usageTime * 60000),
-            endTime: date,
-            category: app.category,
-          });
-        }
-      });
-    }
-
-    // Debug: Log the total usage for verification
-    const totalUsage = sampleData.reduce(
-      (sum, item) => sum + item.usageTime,
-      0,
-    );
-    const avgDailyUsage = totalUsage / days;
-    console.log(
-      `📊 Generated ${sampleData.length} data points for ${days} days`,
-    );
-    console.log(
-      `📊 Total usage: ${totalUsage} minutes (${(totalUsage / 60).toFixed(
-        1,
-      )} hours)`,
-    );
-    console.log(
-      `📊 Average daily usage: ${avgDailyUsage.toFixed(1)} minutes (${(
-        avgDailyUsage / 60
-      ).toFixed(1)} hours)`,
-    );
-
-    return sampleData;
-  }
-
-  // Get monthly usage data
-  async getMonthlyUsageData(): Promise<AppUsageData[]> {
-    return this.getAppUsageForPeriod(30);
   }
 
   // Get phone usage impact on sleep
