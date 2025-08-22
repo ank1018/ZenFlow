@@ -198,7 +198,7 @@ export function todosForDate(list: Todo[], date: Date) {
 
 // Sort todos by start time, then by due date, then by priority
 export function sortTodos(todos: Todo[]): Todo[] {
-  return [...todos].sort((a, b) => {
+  return todos.sort((a, b) => {
     const aStart = startOf(a);
     const bStart = startOf(b);
 
@@ -214,10 +214,63 @@ export function sortTodos(todos: Todo[]): Todo[] {
     // Then sort by due date
     if (a.dueDate && b.dueDate) {
       const aDue =
-        typeof a.dueDate === 'string' ? new Date(a.dueDate) : a.dueDate;
+        typeof a.dueDate === 'string'
+          ? new Date(a.dueDate).getTime()
+          : a.dueDate.getTime();
       const bDue =
-        typeof b.dueDate === 'string' ? new Date(b.dueDate) : b.dueDate;
-      return aDue.getTime() - bDue.getTime();
+        typeof b.dueDate === 'string'
+          ? new Date(b.dueDate).getTime()
+          : b.dueDate.getTime();
+      return aDue - bDue;
+    }
+
+    // Finally sort by priority
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
+  });
+}
+
+// Sort todos to show next task closest to current time (for list view)
+export function sortTodosByNextTask(todos: Todo[]): Todo[] {
+  const now = new Date();
+  const nowTime = now.getTime();
+
+  return todos.sort((a, b) => {
+    const aStart = startOf(a);
+    const bStart = startOf(b);
+
+    // If both have start times, prioritize the one closest to current time
+    if (aStart && bStart) {
+      const aTime = aStart.getTime();
+      const bTime = bStart.getTime();
+
+      // If one is in the future and one is in the past, prioritize future tasks
+      const aIsFuture = aTime > nowTime;
+      const bIsFuture = bTime > nowTime;
+
+      if (aIsFuture && !bIsFuture) return -1;
+      if (!aIsFuture && bIsFuture) return 1;
+
+      // If both are in the same time direction, sort by closest to current time
+      return Math.abs(aTime - nowTime) - Math.abs(bTime - nowTime);
+    }
+
+    // If one has start time and other doesn't, prioritize the one with start time
+    if (aStart && !bStart) return -1;
+    if (!aStart && bStart) return 1;
+
+    // Then sort by due date
+    if (a.dueDate && b.dueDate) {
+      const aDue =
+        typeof a.dueDate === 'string'
+          ? new Date(a.dueDate).getTime()
+          : a.dueDate.getTime();
+      const bDue =
+        typeof b.dueDate === 'string'
+          ? new Date(b.dueDate).getTime()
+          : b.dueDate.getTime();
+
+      return Math.abs(aDue - nowTime) - Math.abs(bDue - nowTime);
     }
 
     // Finally sort by priority

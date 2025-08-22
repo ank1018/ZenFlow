@@ -527,6 +527,7 @@ import {
   endOf,
   todosForDate,
   sortTodos,
+  sortTodosByNextTask,
 } from './helper-functions';
 import TimelineView from './TimelineView';
 import { ListView } from './ListView';
@@ -549,6 +550,7 @@ const TodoScreen: React.FC = () => {
 
   const [filter, setFilter] = useState<'all' | 'today' | 'high'>('all');
   const [viewMode, setViewMode] = useState<'timeline' | 'list'>('timeline');
+  const [isViewModeChanging, setIsViewModeChanging] = useState(false);
 
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -656,7 +658,19 @@ const TodoScreen: React.FC = () => {
     }
   };
 
-  const getFilteredTodos = () => {
+  const handleViewModeChange = (newViewMode: 'timeline' | 'list') => {
+    if (newViewMode !== viewMode) {
+      setIsViewModeChanging(true);
+      setViewMode(newViewMode);
+      // Clear loading state after a short delay to allow for smooth transition
+      setTimeout(() => setIsViewModeChanging(false), 300);
+    }
+  };
+
+  // Memoized filtered and sorted todos for better performance
+  const filteredTodos = useMemo(() => {
+    const startTime = performance.now();
+
     let filtered;
     switch (filter) {
       case 'today':
@@ -669,20 +683,41 @@ const TodoScreen: React.FC = () => {
         filtered = todos;
     }
 
-    // Sort the filtered todos
-    return sortTodos(filtered);
-  };
+    // Sort the filtered todos based on view mode
+    let result;
+    if (viewMode === 'list') {
+      // For list view, show next task closest to current time
+      result = sortTodosByNextTask(filtered);
+    } else {
+      // For timeline view, use chronological sorting
+      result = sortTodos(filtered);
+    }
+
+    const endTime = performance.now();
+    console.log(
+      `⚡ Filtered and sorted ${result.length} todos in ${(
+        endTime - startTime
+      ).toFixed(2)}ms`,
+    );
+
+    return result;
+  }, [todos, filter, viewMode]);
 
   const todosForSelectedDay = useMemo(() => {
     const filtered = todosForDate(todos, selectedDate);
     return sortTodos(filtered);
   }, [todos, selectedDate]);
-
-  const filteredTodos = getFilteredTodos();
-  const completedCount = todos.filter((t: Todo) => t.completed).length;
-  const totalCount = todos.length;
-  const completionPercentage =
-    totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  // Memoized completion stats
+  const { completedCount, totalCount, completionPercentage } = useMemo(() => {
+    const completed = todos.filter((t: Todo) => t.completed).length;
+    const total = todos.length;
+    const percentage = total > 0 ? (completed / total) * 100 : 0;
+    return {
+      completedCount: completed,
+      totalCount: total,
+      completionPercentage: percentage,
+    };
+  }, [todos]);
 
   // Loading state with improved animation
   if (loading) {
@@ -865,7 +900,7 @@ const TodoScreen: React.FC = () => {
                 styles.viewToggle,
                 viewMode === 'timeline' && styles.activeViewToggle,
               ]}
-              onPress={() => setViewMode('timeline')}
+              onPress={() => handleViewModeChange('timeline')}
             >
               <Icon
                 name="timeline-clock"
@@ -878,7 +913,7 @@ const TodoScreen: React.FC = () => {
                 styles.viewToggle,
                 viewMode === 'list' && styles.activeViewToggle,
               ]}
-              onPress={() => setViewMode('list')}
+              onPress={() => handleViewModeChange('list')}
             >
               <Icon
                 name="format-list-bulleted"
@@ -903,14 +938,29 @@ const TodoScreen: React.FC = () => {
             isDarkMode={isDarkMode}
           />
         ) : (
-          <ListView
-            filteredTodos={filteredTodos}
-            filter={filter}
-            setFilter={setFilter}
-            onTaskPress={toggleTodo}
-            onTaskLongPress={openEdit}
-            isDarkMode={isDarkMode}
-          />
+          <>
+            {isViewModeChanging && (
+              <View style={styles.viewModeLoadingContainer}>
+                <ActivityIndicator size="small" color="#6366f1" />
+                <Text
+                  style={[
+                    styles.viewModeLoadingText,
+                    isDarkMode && styles.darkText,
+                  ]}
+                >
+                  Loading list view...
+                </Text>
+              </View>
+            )}
+            <ListView
+              filteredTodos={filteredTodos}
+              filter={filter}
+              setFilter={setFilter}
+              onTaskPress={toggleTodo}
+              onTaskLongPress={openEdit}
+              isDarkMode={isDarkMode}
+            />
+          </>
         )}
 
         {/* Floating Action Button */}
