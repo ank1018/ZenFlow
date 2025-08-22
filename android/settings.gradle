@@ -5,11 +5,6 @@ rootProject.name = 'ZenFlow'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
-// Manual project includes
-include ':react-native-google-signin'
-project(':react-native-google-signin').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-google-signin/google-signin/android')
 
-include ':react-native-calendar-events'
-project(':react-native-calendar-events').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-calendar-events/android')
 
 

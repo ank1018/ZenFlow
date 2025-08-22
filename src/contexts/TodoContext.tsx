@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import DataService from '../services/DataService';
+import NotificationService from '../services/NotificationService';
 import { Todo } from '../types';
 
 interface TodoContextType {
@@ -57,6 +58,12 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const newTodo = await DataService.addTodo(todo);
       setTodos(prev => [...prev, newTodo]);
+
+      // Schedule notifications for the new task
+      if (newTodo && newTodo.startTime) {
+        await NotificationService.scheduleTaskNotifications(newTodo);
+      }
+
       return newTodo;
     } catch (err) {
       setError('Failed to add todo');
@@ -72,6 +79,9 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
         setTodos(prev =>
           prev.map(todo => (todo.id === id ? updatedTodo : todo)),
         );
+
+        // Update notifications for the modified task
+        await NotificationService.updateTaskNotifications(updatedTodo);
       }
       return updatedTodo;
     } catch (err) {
@@ -86,6 +96,9 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
       const success = await DataService.deleteTodo(id);
       if (success) {
         setTodos(prev => prev.filter(todo => todo.id !== id));
+
+        // Remove notifications for the deleted task
+        NotificationService.removeTaskNotifications(id);
       }
       return success;
     } catch (err) {
@@ -158,6 +171,13 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       setTodos(reloadedTodos);
 
+      // Schedule notifications for all tasks with start times
+      const tasksWithStartTimes = reloadedTodos.filter(todo => todo.startTime);
+      if (tasksWithStartTimes.length > 0) {
+        console.log(`🔔 Scheduling notifications for ${tasksWithStartTimes.length} tasks with start times`);
+        await NotificationService.scheduleMultipleTaskNotifications(tasksWithStartTimes);
+      }
+
       console.log(
         `✅ TodoContext: Sync complete: ${addedCount} added, ${updatedCount} updated`,
       );
@@ -222,6 +242,17 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     loadTodos();
   }, [loadTodos]);
+
+  // Schedule notifications for all tasks when todos are loaded
+  useEffect(() => {
+    if (todos.length > 0 && !loading) {
+      const tasksWithStartTimes = todos.filter(todo => todo.startTime);
+      if (tasksWithStartTimes.length > 0) {
+        console.log(`🔔 Initializing notifications for ${tasksWithStartTimes.length} existing tasks`);
+        NotificationService.scheduleMultipleTaskNotifications(tasksWithStartTimes);
+      }
+    }
+  }, [todos, loading]);
 
   const value: TodoContextType = {
     todos,

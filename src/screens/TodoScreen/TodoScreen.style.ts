@@ -54,6 +54,17 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  notificationButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  darkNotificationButton: {
+    backgroundColor: '#334155',
+  },
   viewToggle: {
     width: 40,
     height: 40,
@@ -844,5 +855,38 @@ export const styles = StyleSheet.create({
   },
   activeTodayButtonText: {
     color: '#ffffff',
+  },
+
+  // Notification Settings Modal Styles
+  closeButton: {
+    padding: 8,
+  },
+  modalContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  notificationOption: {
+    marginBottom: 24,
+    padding: 16,
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  notificationOptionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 8,
+  },
+  notificationOptionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
+  notificationOptionDescription: {
+    fontSize: 14,
+    color: '#64748b',
+    lineHeight: 20,
   },
 });

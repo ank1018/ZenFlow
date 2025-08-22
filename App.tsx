@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform, StatusBar } from 'react-native';
@@ -12,10 +12,25 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import InsightsScreen from './src/screens/InsightsScreen'; // Phone usage (charts)
 import TodoScreen from './src/screens/TodoScreen/TodoScreen';
 import { TodoProvider } from './src/contexts/TodoContext';
+import NotificationService from './src/services/NotificationService';
 
 const Tab = createBottomTabNavigator();
 
 const App: React.FC = () => {
+  // Initialize notification service when app starts
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      try {
+        await NotificationService.initialize();
+        await NotificationService.requestPermissions();
+      } catch (error) {
+        console.error('Failed to initialize notification service:', error);
+      }
+    };
+
+    initializeNotifications();
+  }, []);
+
   return (
     <TodoProvider>
       <NavigationContainer

@@ -147,18 +147,12 @@ export function endOf(t: Todo): Date | undefined {
 }
 
 export function todosForDate(list: Todo[], date: Date) {
-  const googleEvents = list.filter(t => t.source === 'google');
-  console.log(
-    `🔍 todosForDate: ${list.length} total todos, ${googleEvents.length} Google events`,
-  );
-
   return list.filter(t => {
     const s = startOf(t);
     const e = endOf(t);
 
     // If no start or end time, skip this todo
     if (!s && !e) {
-      console.log(`❌ Todo "${t.title}" skipped - no start/end time`);
       return false;
     }
 

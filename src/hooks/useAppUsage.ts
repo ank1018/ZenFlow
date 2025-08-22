@@ -18,8 +18,19 @@ export const useAppUsage = () => {
     try {
       setLoading(true);
       setError(null);
-      await appUsageService.startTracking();
-      setIsTracking(true);
+
+      // Check permissions first without requesting them
+      const permissionStatus = await appUsageService.checkPermissionsStatus();
+
+      if (permissionStatus.hasPermissions) {
+        // Only start tracking if we have permissions
+        await appUsageService.startTracking();
+        setIsTracking(true);
+      } else {
+        // Don't automatically request permissions, just log
+        console.log('App usage tracking not started - permissions not granted');
+        setIsTracking(false);
+      }
     } catch (err) {
       // Don't set error for permission issues, just log them
       console.log('App usage tracking started with fallback mode');
@@ -43,11 +54,41 @@ export const useAppUsage = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log(`📱 Loading ${days} days of usage data...`);
       const data = await appUsageService.getAppUsageForPeriod(days);
+      console.log(`📱 Received ${data.length} data points`);
+      const totalUsage = data.reduce((sum, item) => sum + item.usageTime, 0);
+      console.log(
+        `📱 Total usage in data: ${totalUsage} minutes (${(
+          totalUsage / 60
+        ).toFixed(1)} hours)`,
+      );
       setUsageData(data);
     } catch (err) {
       setError('Failed to load usage data');
       console.error('Error loading usage data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const loadMonthlyData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log(`📱 Loading monthly usage data...`);
+      const data = await appUsageService.getMonthlyUsageData();
+      console.log(`📱 Received ${data.length} monthly data points`);
+      const totalUsage = data.reduce((sum, item) => sum + item.usageTime, 0);
+      console.log(
+        `📱 Total monthly usage: ${totalUsage} minutes (${(
+          totalUsage / 60
+        ).toFixed(1)} hours)`,
+      );
+      setUsageData(data);
+    } catch (err) {
+      setError('Failed to load monthly data');
+      console.error('Error loading monthly data:', err);
     } finally {
       setLoading(false);
     }
@@ -67,10 +108,10 @@ export const useAppUsage = () => {
     }
   }, []);
 
-  const getPhoneUsageImpact = useCallback(
-    async (sleepData: any): Promise<PhoneUsageImpact> => {
+  const getPhoneUsageImpact =
+    useCallback(async (): Promise<PhoneUsageImpact> => {
       try {
-        return await appUsageService.getPhoneUsageImpact(sleepData);
+        return await appUsageService.getPhoneUsageImpact();
       } catch (err) {
         console.error('Error getting phone usage impact:', err);
         return {
@@ -81,33 +122,42 @@ export const useAppUsage = () => {
           notifications: 0,
         };
       }
-    },
-    [],
-  );
+    }, []);
 
-  const confirmSleepData = useCallback(
-    async (sleepData: any): Promise<SleepConfirmation> => {
-      try {
-        return await appUsageService.confirmSleepData(sleepData);
-      } catch (err) {
-        console.error('Error confirming sleep data:', err);
-        return {
-          bedtimeAccuracy: true,
-          wakeAccuracy: true,
-          nightDisturbances: 0,
-          sleepQuality: 'good',
-          phoneImpact: {
-            beforeBed: 0,
-            afterWake: 0,
-            nightDisturbances: 0,
-            blueLightExposure: 0,
-            notifications: 0,
-          },
-        };
+  const requestPermissions = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const granted = await appUsageService.requestPermissions();
+      if (granted) {
+        // If permissions were granted, start tracking
+        await appUsageService.startTracking();
+        setIsTracking(true);
       }
-    },
-    [],
-  );
+      return granted;
+    } catch (err) {
+      setError('Failed to request permissions');
+      console.error('Error requesting permissions:', err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const checkPermissions = useCallback(async () => {
+    try {
+      return await appUsageService.checkPermissionsStatus();
+    } catch (err) {
+      console.error('Error checking permissions:', err);
+      return {
+        hasPermissions: false,
+        needsPermissions: true,
+        permissionType: 'Unknown',
+        availablePermissions: [],
+        isProduction: false,
+      };
+    }
+  }, []);
 
   useEffect(() => {
     loadUsageData();
@@ -123,8 +173,10 @@ export const useAppUsage = () => {
     startTracking,
     stopTracking,
     loadUsageData,
+    loadMonthlyData,
     loadInsights,
     getPhoneUsageImpact,
-    confirmSleepData,
+    requestPermissions,
+    checkPermissions,
   };
 };

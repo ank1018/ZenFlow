@@ -12,6 +12,8 @@ import {
   Animated,
   Platform,
 } from 'react-native';
+import NotificationService from '../../services/NotificationService';
+import NativeNotificationService from '../../services/NativeNotificationService';
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
 // Custom DateTimePicker component
@@ -546,11 +548,7 @@ const TodoScreen: React.FC = () => {
   } = useTodos() as any;
 
   // Debug logging for todos state changes (only when count changes significantly)
-  useEffect(() => {
-    console.log(
-      `📱 TodoScreen: todos state updated with ${todos.length} items`,
-    );
-  }, [todos.length]); // Only log when count changes, not every render
+  useEffect(() => {}, [todos.length]); // Only log when count changes, not every render
 
   const [filter, setFilter] = useState<'all' | 'today' | 'high'>('all');
   const [viewMode, setViewMode] = useState<'timeline' | 'list'>('timeline');
@@ -584,31 +582,23 @@ const TodoScreen: React.FC = () => {
 
     const autoSyncCalendar = async () => {
       if (hasAutoSynced) {
-        console.log('🔄 Auto-sync already completed, skipping...');
         return;
       }
 
       try {
-        console.log('🔄 Checking Google Calendar sign-in status...');
         const isSignedIn = await GoogleCalendarService.isSignedIn();
         if (isSignedIn) {
-          console.log('🔄 Auto-syncing calendar events...');
           const calendarTodos =
             await GoogleCalendarService.syncGoogleCalendarToTodos();
-          console.log(
-            `📅 Fetched ${calendarTodos.length} calendar events for auto-sync`,
-          );
 
           if (calendarTodos.length > 0) {
             const syncedCount = await syncWithGoogleCalendar(calendarTodos);
-            console.log(`✅ Auto-sync complete: ${syncedCount} events synced`);
+
             hasAutoSynced = true;
           } else {
-            console.log('📅 No calendar events found for auto-sync');
             hasAutoSynced = true;
           }
         } else {
-          console.log('📅 User not signed in to Google Calendar');
           hasAutoSynced = true;
         }
       } catch (error) {
@@ -688,9 +678,6 @@ const TodoScreen: React.FC = () => {
 
   const todosForSelectedDay = useMemo(() => {
     const filtered = todosForDate(todos, selectedDate);
-    console.log(
-      `📅 todosForSelectedDay: ${todos.length} total todos, ${filtered.length} for selected date`,
-    );
     return sortTodos(filtered);
   }, [todos, selectedDate]);
 
@@ -803,6 +790,17 @@ const TodoScreen: React.FC = () => {
             </View>
             <View style={styles.headerActions}>
               <CalendarSyncButton />
+              {/* <TouchableOpacity
+                style={[
+                  styles.notificationButton,
+                  isDarkMode && styles.darkNotificationButton,
+                ]}
+                onPress={() => {
+                  // Notification settings removed
+                }}
+              >
+                <Icon name="bell-outline" size={20} color="#6366f1" />
+              </TouchableOpacity> */}
             </View>
           </View>
         </View>
