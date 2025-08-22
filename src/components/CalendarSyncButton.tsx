@@ -7,6 +7,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import GoogleCalendarService from '../services/GoogleCalendarService';
 import { useTodos } from '../contexts/TodoContext';
 
@@ -166,7 +167,7 @@ const CalendarSyncButton: React.FC = () => {
             <ActivityIndicator size="small" color="white" />
           ) : (
             <>
-              <Text style={styles.buttonIcon}>📅</Text>
+              <Icon name="google" size={14} color="white" />
               <Text style={styles.buttonText}>Sign In</Text>
             </>
           )}
@@ -182,7 +183,7 @@ const CalendarSyncButton: React.FC = () => {
               <ActivityIndicator size="small" color="white" />
             ) : (
               <>
-                <Text style={styles.buttonIcon}>🔄</Text>
+                <Icon name="sync" size={14} color="white" />
                 <Text style={styles.buttonText}>Sync</Text>
               </>
             )}
@@ -192,7 +193,7 @@ const CalendarSyncButton: React.FC = () => {
             onPress={handleSignOut}
             disabled={isLoading}
           >
-            <Text style={styles.buttonIcon}>🚪</Text>
+            <Icon name="logout" size={14} color="white" />
             <Text style={styles.buttonText}>Out</Text>
           </TouchableOpacity>
         </View>
@@ -220,6 +221,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     minWidth: 60,
+    borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -228,19 +230,19 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     backgroundColor: '#4285F4',
+    borderColor: '#4285F4',
   },
   syncButton: {
     backgroundColor: '#34A853',
+    borderColor: '#34A853',
   },
   signOutButton: {
     backgroundColor: '#EA4335',
-  },
-  buttonIcon: {
-    fontSize: 14,
+    borderColor: '#EA4335',
   },
   buttonText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
 });

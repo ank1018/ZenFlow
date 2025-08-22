@@ -56,6 +56,22 @@ const InsightsScreen = () => {
     loadUsageData(7); // Load 7 days for the graph
   }, []);
 
+  // Periodic refresh to check for real data availability
+  useEffect(() => {
+    if (permissionStatus?.hasPermissions) {
+      const interval = setInterval(async () => {
+        try {
+          console.log('🔄 Periodic refresh checking for real data...');
+          await loadUsageData(7);
+        } catch (error) {
+          console.error('❌ Error in periodic refresh:', error);
+        }
+      }, 30000); // Check every 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [permissionStatus?.hasPermissions]);
+
   // Check permissions on mount
   useEffect(() => {
     const checkPermissionStatus = async () => {
@@ -97,6 +113,17 @@ const InsightsScreen = () => {
         );
         const status = await checkPermissions();
         setPermissionStatus(status);
+
+        // Auto-refresh data after permissions are granted
+        console.log('🔄 Auto-refreshing data after permissions granted...');
+        setTimeout(async () => {
+          try {
+            await loadUsageData(7);
+            console.log('✅ Data refreshed after permissions granted');
+          } catch (error) {
+            console.error('❌ Error refreshing data after permissions:', error);
+          }
+        }, 2000); // Wait 2 seconds for system to update
       } else {
         Alert.alert(
           'Permissions Required',

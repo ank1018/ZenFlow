@@ -402,7 +402,17 @@ const UsageGraph: React.FC<UsageGraphProps> = ({ data }) => {
       <View style={styles.headerSection}>
         <View style={styles.headerLeft}>
           <Text style={styles.sectionTitle}>Daily Usage Patterns</Text>
-          <Text style={styles.sectionSubtitle}>Past 7 days of screen time</Text>
+          <Text style={styles.sectionSubtitle}>
+            Past 7 days of screen time
+            {processedData.length > 0 &&
+              processedData.some(day =>
+                Object.values(day.apps).some(usage => usage > 1000),
+              ) && (
+                <Text style={{ color: '#F59E0B', fontWeight: '600' }}>
+                  {' • Sample Data'}
+                </Text>
+              )}
+          </Text>
         </View>
       </View>
 
