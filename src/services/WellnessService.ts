@@ -164,7 +164,7 @@ class WellnessService {
     // Calculate weekly progress
     this.calculateWeeklyProgress(usageData);
 
-    console.log('🏆 Final stats:', this.stats);
+    // console.log removed
 
     return this.stats;
   }
@@ -184,7 +184,7 @@ class WellnessService {
       .sort()
       .reverse();
 
-    console.log('📅 Calculating streak for dates:', dates);
+    // console.log removed
 
     let currentStreak = 0;
     let bestStreak = this.stats.bestStreak;
@@ -192,7 +192,7 @@ class WellnessService {
 
     // Check if we have data for today
     const hasTodayData = dates.includes(today);
-    console.log('📅 Has today data:', hasTodayData, 'Today:', today);
+    // console.log removed
 
     for (const date of dates) {
       const dayData = usageData.filter(
@@ -218,7 +218,7 @@ class WellnessService {
         if (wellnessScore >= 60) {
           currentStreak++;
           bestStreak = Math.max(bestStreak, currentStreak);
-          console.log(`✅ Streak continues: ${currentStreak} days`);
+          // console.log removed
         } else {
           console.log(
             `❌ Streak broken: Score ${wellnessScore.toFixed(1)}% < 60%`,
@@ -236,7 +236,7 @@ class WellnessService {
 
     // If we don't have today's data, don't count today in the streak
     if (!hasTodayData && currentStreak > 0) {
-      console.log('⚠️ No today data, not counting today in streak');
+      // console.log removed
     }
 
     this.stats.currentStreak = currentStreak;
@@ -256,7 +256,7 @@ class WellnessService {
       ),
     ].sort();
 
-    console.log('🏆 Updating achievements for dates:', dates);
+    // console.log removed
 
     // First day achievement
     const firstDayAchievement = this.achievements.find(
@@ -270,7 +270,7 @@ class WellnessService {
       firstDayAchievement.progress = 1;
       firstDayAchievement.unlocked = true;
       firstDayAchievement.unlockedDate = new Date().toLocaleDateString();
-      console.log('🏆 Unlocked: First Steps');
+      // console.log removed
     }
 
     // Week streak achievement
@@ -285,7 +285,7 @@ class WellnessService {
       ) {
         weekStreakAchievement.unlocked = true;
         weekStreakAchievement.unlockedDate = new Date().toLocaleDateString();
-        console.log('🏆 Unlocked: Week Warrior');
+        // console.log removed
       }
     }
 
@@ -316,7 +316,7 @@ class WellnessService {
       if (lowUsageAchievement.progress >= 7 && !lowUsageAchievement.unlocked) {
         lowUsageAchievement.unlocked = true;
         lowUsageAchievement.unlockedDate = new Date().toLocaleDateString();
-        console.log('🏆 Unlocked: Digital Minimalist');
+        // console.log removed
       }
     }
 
@@ -355,7 +355,7 @@ class WellnessService {
       ) {
         productivityAchievement.unlocked = true;
         productivityAchievement.unlockedDate = new Date().toLocaleDateString();
-        console.log('🏆 Unlocked: Productivity Master');
+        // console.log removed
       }
     }
 

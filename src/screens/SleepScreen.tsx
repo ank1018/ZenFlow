@@ -83,7 +83,7 @@ const SleepScreen: React.FC = () => {
     const days = selectedPeriod === 'week' ? 7 : 30;
     const periodSleepData = await getSleepDataForPeriod(days);
 
-    console.log('SleepScreen: periodSleepData', periodSleepData);
+    // console.log removed
 
     // Convert to hours for display
     const hoursData = periodSleepData.map(data => data.duration / 60);
@@ -106,7 +106,7 @@ const SleepScreen: React.FC = () => {
       const healthInsights =
         await appUsageService.getHealthAndProductivityInsights();
       setPhoneUsageInsights(healthInsights);
-      console.log('📱 Phone usage insights loaded:', healthInsights);
+      // console.log removed
     } catch (error) {
       console.error('Error loading phone usage insights:', error);
     }
@@ -566,7 +566,7 @@ const SleepScreen: React.FC = () => {
     const maxHours = periodData.length > 0 ? Math.max(...periodData) : 8;
     const sleepGoal = settings?.sleepGoal || 8;
 
-    console.log('Chart data:', { periodData, maxHours, sleepGoal, days });
+    // console.log removed
 
     return (
       <View style={styles.chartContainer}>

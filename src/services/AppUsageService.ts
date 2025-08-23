@@ -68,11 +68,11 @@ class AppUsageService {
     isProduction: boolean;
   }> {
     const isProduction = this.isProductionBuild();
-    console.log('🔍 Checking permissions status...', { isProduction });
+    // console.log removed
 
     if (Platform.OS === 'android') {
       try {
-        console.log('🔍 Checking Android usage stats permission...');
+        // console.log removed
         const hasUsageStatsPermission =
           await AppUsageModule.checkUsageStatsPermission();
 
@@ -102,7 +102,7 @@ class AppUsageService {
     }
 
     // iOS - would need Screen Time API
-    console.log('🔍 iOS platform - Screen Time API not implemented yet');
+    // console.log removed
     return {
       hasPermissions: false,
       needsPermissions: false,
@@ -116,7 +116,7 @@ class AppUsageService {
   async requestPermissions(): Promise<boolean> {
     if (Platform.OS === 'android') {
       try {
-        console.log('🔍 Requesting Android usage stats permission...');
+        // console.log removed
         await AppUsageModule.requestUsageStatsPermission();
 
         // Wait a moment for user to grant permission
@@ -126,7 +126,7 @@ class AppUsageService {
         const hasPermission = await AppUsageModule.checkUsageStatsPermission();
         this.hasPermissions = hasPermission;
 
-        console.log('🔍 Permission request result:', hasPermission);
+        // console.log removed
         return hasPermission;
       } catch (error) {
         console.error('❌ Permission request failed:', error);
@@ -134,7 +134,7 @@ class AppUsageService {
       }
     }
 
-    console.log('🔍 iOS platform - permissions handled differently');
+    // console.log removed
     return false;
   }
 
@@ -151,7 +151,7 @@ class AppUsageService {
         const permissionStatus = await this.checkPermissionsStatus();
 
         if (!permissionStatus.hasPermissions) {
-          console.log('🔍 No permissions found, cannot start tracking');
+          // console.log removed
           throw new Error('Usage statistics permission not granted');
         }
 
@@ -160,9 +160,9 @@ class AppUsageService {
         );
         await AppUsageModule.startUsageTracking();
         this.isTracking = true;
-        console.log('App usage tracking started successfully');
+        // console.log removed
       } else {
-        console.log('🔍 Cannot start tracking - platform not supported');
+        // console.log removed
         throw new Error('Platform not supported');
       }
     } catch (error) {
@@ -182,12 +182,12 @@ class AppUsageService {
     }
 
     this.isTracking = false;
-    console.log('App usage tracking stopped');
+    // console.log removed
   }
 
   // Get app usage data for a period
   async getAppUsageForPeriod(days: number = 7): Promise<AppUsageData[]> {
-    console.log('🔍 getAppUsageForPeriod called with days:', days);
+    // console.log removed
 
     // Check cache first
     const cacheKey = `usage_data_${days}`;
@@ -197,7 +197,7 @@ class AppUsageService {
       this.dataCache.has(cacheKey) &&
       now - this.lastCacheUpdate < this.CACHE_DURATION
     ) {
-      console.log('🔍 Returning cached data for', days, 'days');
+      // console.log removed
       return this.dataCache.get(cacheKey)!;
     }
 
@@ -206,14 +206,14 @@ class AppUsageService {
       const permissionStatus = await this.checkPermissionsStatus();
 
       if (!permissionStatus.hasPermissions) {
-        console.log('🔍 No permissions, returning empty array');
+        // console.log removed
         return [];
       }
 
       try {
-        console.log('🔍 Getting real usage stats for', days, 'days');
+        // console.log removed
         const usageStats = await AppUsageModule.getUsageStats(days);
-        console.log('🔍 Raw usage stats received:', usageStats.length, 'apps');
+        // console.log removed
 
         // Check if we have real usage data
         if (usageStats.length === 0) {
@@ -247,7 +247,7 @@ class AppUsageService {
       }
     }
 
-    console.log('🔍 No platform support, returning empty array');
+    // console.log removed
     return [];
   }
 
@@ -255,7 +255,7 @@ class AppUsageService {
   private cacheData(key: string, data: AppUsageData[]): void {
     this.dataCache.set(key, data);
     this.lastCacheUpdate = Date.now();
-    console.log('🔍 Cached data for key:', key, 'with', data.length, 'items');
+    // console.log removed
   }
 
   // Process usage data consistently without random variations
@@ -351,7 +351,7 @@ class AppUsageService {
       dailyTotals.set(dateKey, currentTotal + item.usageTime);
     });
 
-    console.log('🔍 Daily usage totals:', Object.fromEntries(dailyTotals));
+    // console.log removed
     console.log('🔍 Processed daily data:', {
       totalItems: processedData.length,
       sampleItems: processedData.slice(0, 3).map(item => ({
@@ -578,7 +578,7 @@ class AppUsageService {
 
   // Generate sample data for testing and fallback
   private generateSampleData(days: number): AppUsageData[] {
-    console.log('🔍 Generating sample data for', days, 'days');
+    // console.log removed
 
     const sampleApps = [
       { name: 'ZenFlow', package: 'com.zenflow', category: 'health' as const },
@@ -655,7 +655,7 @@ class AppUsageService {
       });
     }
 
-    console.log('🔍 Generated consistent sample data:', data.length, 'items');
+    // console.log removed
     return data;
   }
 
@@ -729,7 +729,7 @@ class AppUsageService {
   public clearCache(): void {
     this.dataCache.clear();
     this.lastCacheUpdate = 0;
-    console.log('🔍 Cache cleared');
+    // console.log removed
   }
 
   // Force refresh data (clear cache and get fresh data)
@@ -742,7 +742,7 @@ class AppUsageService {
   async getPhoneUsageImpact(): Promise<PhoneUsageImpact> {
     const usageData = await this.getAppUsageForPeriod(1);
 
-    console.log('🌙 CALCULATING PHONE USAGE IMPACT ON SLEEP...');
+    // console.log removed
     console.log(
       '📱 Input usage data for impact calculation:',
       JSON.stringify(usageData, null, 2),
@@ -810,7 +810,7 @@ class AppUsageService {
   }> {
     const usageData = await this.getAppUsageForPeriod(1);
 
-    console.log('📊 CALCULATING APP USAGE INSIGHTS...');
+    // console.log removed
     console.log(
       '📱 Input usage data for insights:',
       JSON.stringify(usageData, null, 2),
@@ -937,7 +937,7 @@ class AppUsageService {
     const usageData = await this.getAppUsageForPeriod(7); // Get 7 days of data
     const todayData = await this.getAppUsageForPeriod(1);
 
-    console.log('🧠 ANALYZING HEALTH AND PRODUCTIVITY INSIGHTS...');
+    // console.log removed
     console.log(
       '📊 Input data - 7 days:',
       usageData.length,

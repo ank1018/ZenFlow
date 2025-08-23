@@ -63,7 +63,7 @@ class NativeNotificationService {
         triggerTime.getTime(),
       );
       
-      console.log('📱 Native notification scheduled result:', result);
+      // console.log removed
       return result;
     } catch (error) {
       console.error('❌ Error scheduling notification:', error);

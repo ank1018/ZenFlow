@@ -62,7 +62,7 @@ const InsightsScreen = () => {
 
   // Handle insight actions
   const handleInsightAction = (insight: WellnessInsight) => {
-    console.log('🎯 Insight action pressed:', insight.id);
+    // console.log removed
 
     switch (insight.id) {
       case 'high_usage_warning':
@@ -207,10 +207,10 @@ const InsightsScreen = () => {
     });
 
     if (usageData.length > 0) {
-      console.log('📊 Loading wellness data...');
+      // console.log removed
       loadWellnessData();
     } else {
-      console.log('⚠️ No usage data available yet');
+      // console.log removed
     }
   }, [usageData]);
 
@@ -245,7 +245,7 @@ const InsightsScreen = () => {
           unlockedAchievements: achievementList.filter(a => a.unlocked).length,
         }));
       } catch (error) {
-        console.log('Error initializing wellness service:', error);
+        // console.log removed
       }
     };
 
@@ -257,7 +257,7 @@ const InsightsScreen = () => {
     if (permissionStatus?.hasPermissions && hasLoadedOnce) {
       const interval = setInterval(async () => {
         try {
-          console.log('🔄 Silent refresh checking for real data...');
+          // console.log removed
           // Silent refresh - don't show loading state
           await silentRefreshData(7);
         } catch (error) {
@@ -276,7 +276,7 @@ const InsightsScreen = () => {
         const status = await checkPermissions();
         setPermissionStatus(status);
       } catch (error) {
-        console.log('Error checking permissions:', error);
+        // console.log removed
       }
     };
     checkPermissionStatus();
@@ -312,11 +312,11 @@ const InsightsScreen = () => {
         setPermissionStatus(status);
 
         // Auto-refresh data after permissions are granted
-        console.log('🔄 Auto-refreshing data after permissions granted...');
+        // console.log removed
         setTimeout(async () => {
           try {
             await loadUsageData(7);
-            console.log('✅ Data refreshed after permissions granted');
+            // console.log removed
           } catch (error) {
             console.error('❌ Error refreshing data after permissions:', error);
           }
@@ -382,7 +382,7 @@ const InsightsScreen = () => {
         insights: wellnessInsightList.length,
       });
     } catch (error) {
-      console.log('Error loading wellness data:', error);
+      // console.log removed
     }
   };
 
@@ -394,7 +394,7 @@ const InsightsScreen = () => {
     >();
 
     const today = new Date().toISOString().split('T')[0];
-    console.log('📅 Processing data for today:', today);
+    // console.log removed
 
     // Only process today's data for stats
     usageData.forEach(item => {
@@ -1044,7 +1044,7 @@ const InsightsScreen = () => {
                   achievement={achievement}
                   onPress={() => {
                     // Handle achievement press
-                    console.log('Achievement pressed:', achievement.id);
+                    // console.log removed
                   }}
                 />
               ))}

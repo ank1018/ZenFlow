@@ -42,9 +42,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(true);
       setError(null);
       const data = await DataService.getTodos();
-      console.log(
-        `🔄 TodoContext: loadTodos: Loaded ${data.length} todos from storage`,
-      );
+      // console.log removed
       setTodos(data);
     } catch (err) {
       setError('Failed to load todos');
@@ -118,13 +116,11 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
       setError(null);
 
       if (!syncedTodos || syncedTodos.length === 0) {
-        console.log('No todos to sync');
+        // console.log removed
         return 0;
       }
 
-      console.log(
-        `🔄 TodoContext: Starting sync with ${syncedTodos.length} calendar events`,
-      );
+      // console.log removed
 
       // Get current todos from storage to ensure we have the latest data
       const currentTodos = await DataService.getTodos();
@@ -166,30 +162,28 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Reload all todos from storage to ensure we have the latest state
       const reloadedTodos = await DataService.getTodos();
-      console.log(
-        `📊 TodoContext: Reloaded ${reloadedTodos.length} todos from storage after sync`,
-      );
+      // console.log removed
       setTodos(reloadedTodos);
 
       // Schedule notifications for all tasks with start times
       const tasksWithStartTimes = reloadedTodos.filter(todo => todo.startAt);
       if (tasksWithStartTimes.length > 0) {
-        console.log(`🔔 Scheduling notifications for ${tasksWithStartTimes.length} tasks with start times`);
-        
+        // console.log removed
+
         // Log Google Calendar tasks specifically
-        const calendarTasks = tasksWithStartTimes.filter(todo => todo.isFromCalendar);
+        const calendarTasks = tasksWithStartTimes.filter(
+          todo => todo.isFromCalendar,
+        );
         if (calendarTasks.length > 0) {
-          console.log(`📅 Found ${calendarTasks.length} Google Calendar tasks with start times:`, 
-            calendarTasks.map(t => ({ title: t.title, startAt: t.startAt, calendarEventId: t.calendarEventId }))
-          );
+          // console.log removed
         }
-        
-        await NotificationService.scheduleMultipleTaskNotifications(tasksWithStartTimes);
+
+        await NotificationService.scheduleMultipleTaskNotifications(
+          tasksWithStartTimes,
+        );
       }
 
-      console.log(
-        `✅ TodoContext: Sync complete: ${addedCount} added, ${updatedCount} updated`,
-      );
+      // console.log removed
       return addedCount + updatedCount;
     } catch (err) {
       setError('Failed to sync with Google Calendar');
@@ -257,8 +251,10 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
     if (todos.length > 0 && !loading) {
       const tasksWithStartTimes = todos.filter(todo => todo.startAt);
       if (tasksWithStartTimes.length > 0) {
-        console.log(`🔔 Initializing notifications for ${tasksWithStartTimes.length} existing tasks`);
-        NotificationService.scheduleMultipleTaskNotifications(tasksWithStartTimes);
+        // console.log removed
+        NotificationService.scheduleMultipleTaskNotifications(
+          tasksWithStartTimes,
+        );
       }
     }
   }, [todos, loading]);

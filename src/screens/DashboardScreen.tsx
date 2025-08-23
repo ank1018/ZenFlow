@@ -49,10 +49,10 @@ const DashboardScreen: React.FC = () => {
       try {
         const status =
           await AppUsageService.getInstance().checkPermissionsStatus();
-        console.log('🔍 Dashboard Permission Status:', status);
+        // console.log removed
         setPermissionStatus(status);
       } catch (error) {
-        console.log('Error checking permissions:', error);
+        // console.log removed
       }
     };
     checkPermissions();
@@ -74,28 +74,28 @@ const DashboardScreen: React.FC = () => {
   // Comprehensive logging of all available data
   useEffect(() => {
     const logAllAvailableData = async () => {
-      console.log('🚀 ===== COMPREHENSIVE PHONE USAGE DATA LOG ====');
+      // console.log removed
 
       try {
         const appUsageService = AppUsageService.getInstance();
 
         // 1. Log permission status
-        console.log('🔐 PERMISSION STATUS:', permissionStatus);
+        // console.log removed
 
         // 2. Log raw app usage data
-        console.log('📱 FETCHING RAW APP USAGE DATA...');
+        // console.log removed
         const rawUsageData = await appUsageService.getAppUsageForPeriod(1);
-        console.log('📱 RAW APP USAGE DATA (1 day):', rawUsageData);
+        // console.log removed
 
         // 3. Log phone usage impact
-        console.log('🌙 FETCHING PHONE USAGE IMPACT...');
+        // console.log removed
         const phoneImpact = await appUsageService.getPhoneUsageImpact();
-        console.log('🌙 PHONE USAGE IMPACT:', phoneImpact);
+        // console.log removed
 
         // 4. Log app usage insights
-        console.log('📊 FETCHING APP USAGE INSIGHTS...');
+        // console.log removed
         const insights = await appUsageService.getAppUsageInsights();
-        console.log('📊 APP USAGE INSIGHTS:', insights);
+        // console.log removed
 
         // 5. Log current tracking status
         console.log('🎯 TRACKING STATUS:', {
@@ -131,7 +131,7 @@ const DashboardScreen: React.FC = () => {
           },
         });
 
-        console.log('🚀 ===== END COMPREHENSIVE DATA LOG ====');
+        // console.log removed
       } catch (error) {
         console.error('❌ Error logging comprehensive data:', error);
       }
@@ -315,7 +315,7 @@ const DashboardScreen: React.FC = () => {
 
   // Manual permission test for debugging
   const testPermissionRequest = async () => {
-    console.log('🧪 Manual permission test triggered');
+    // console.log removed
     try {
       const appUsageService = AppUsageService.getInstance();
 

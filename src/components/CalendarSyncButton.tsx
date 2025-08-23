@@ -45,7 +45,6 @@ const CalendarSyncButton: React.FC = () => {
         // Trigger auto-sync after successful sign-in
         setTimeout(async () => {
           try {
-            console.log('🔄 Triggering sync after sign-in...');
             const calendarEvents =
               await GoogleCalendarService.syncGoogleCalendarToTodos();
             console.log(
@@ -65,7 +64,6 @@ const CalendarSyncButton: React.FC = () => {
 
               // Single refresh after sign-in sync
               setTimeout(() => {
-                console.log('🔄 Refreshing after sign-in sync...');
                 refresh();
               }, 500);
             }
@@ -90,7 +88,6 @@ const CalendarSyncButton: React.FC = () => {
   const handleSync = async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Starting manual calendar sync...');
 
       const calendarEvents =
         await GoogleCalendarService.syncGoogleCalendarToTodos();
@@ -112,7 +109,6 @@ const CalendarSyncButton: React.FC = () => {
 
         // Force refresh to ensure TodoScreen gets updated state
         setTimeout(() => {
-          console.log('🔄 Refreshing after manual sync...');
           refresh();
         }, 500);
       } else {
