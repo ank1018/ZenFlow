@@ -264,25 +264,26 @@ const UsageGraph: React.FC<UsageGraphProps> = ({ data }) => {
           </Text>
           {isSelected && (
             <View style={styles.comparisonContainer}>
-              <Icon
+              {/* <Icon
                 name={usageStatus.icon}
                 size={12}
                 color={usageStatus.color}
-              />
+              /> */}
               <Text
                 style={[styles.comparisonText, { color: usageStatus.color }]}
               >
-                {usageStatus.status === 'high'
-                  ? '+'
-                  : usageStatus.status === 'low'
-                  ? '-'
-                  : ''}
-                {Math.abs(
-                  Math.round(
-                    ((dayData.totalUsage - averageUsage) / averageUsage) * 100,
-                  ),
+                {averageUsage > 0 ? (
+                  <>
+                    {dayData.totalUsage > averageUsage ? '+' : ''}
+                    {Math.round(
+                      ((dayData.totalUsage - averageUsage) / averageUsage) *
+                        100,
+                    )}
+                    %
+                  </>
+                ) : (
+                  '0%'
                 )}
-                %
               </Text>
             </View>
           )}
@@ -418,13 +419,6 @@ const UsageGraph: React.FC<UsageGraphProps> = ({ data }) => {
 
       {/* Enhanced Graph */}
       <View style={styles.graphContainer}>
-        <View style={styles.graphHeader}>
-          <Text style={styles.graphTitle}>Screen Time</Text>
-          <Text style={styles.averageLine}>
-            Avg: {formatTime(averageUsage)}
-          </Text>
-        </View>
-
         {/* Average line indicator */}
         <View style={styles.averageLineContainer}>
           <View
@@ -553,11 +547,34 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    height: 1,
-    backgroundColor: '#E5E7EB',
-    borderStyle: 'dashed',
+    height: 2,
+    backgroundColor: '#6366F1',
+    borderStyle: 'solid',
+    borderWidth: 0,
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  averageLineLabel: {
+    position: 'absolute',
+    right: 0,
+    top: -25,
+    fontSize: 11,
+    color: '#6366F1',
+    fontWeight: '600',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#9CA3AF',
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   graph: {
     flexDirection: 'row',
@@ -575,7 +592,7 @@ const styles = StyleSheet.create({
   },
   bar: {
     width: 32,
-    borderRadius: 8,
+    // borderRadius: 8,
     marginBottom: 12,
     position: 'relative',
     overflow: 'hidden',
@@ -584,7 +601,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
+    // borderWidth: 1,
     borderColor: '#E5E7EB',
     borderStyle: 'dashed',
   },
@@ -592,7 +609,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    borderRadius: 8,
+    // borderRadius: 8,
     overflow: 'hidden',
   },
   barGradient: {

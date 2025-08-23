@@ -18,6 +18,14 @@ import UsageGraph from '../components/UsageGraph';
 import PrivacyInfo from '../components/PrivacyInfo';
 import InsightsShimmer from '../components/InsightsShimmer';
 import ShimmerLoader from '../components/ShimmerLoader';
+import WellnessStreak from '../components/WellnessStreak';
+import AchievementCard from '../components/AchievementCard';
+import InsightCard from '../components/InsightCard';
+import WellnessService, {
+  Achievement,
+  WellnessInsight,
+  WellnessStats,
+} from '../services/WellnessService';
 
 const { width } = Dimensions.get('window');
 
@@ -27,6 +35,20 @@ const InsightsScreen = () => {
   const [showPrivacyInfo, setShowPrivacyInfo] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [wellnessStats, setWellnessStats] = useState<WellnessStats>({
+    currentStreak: 0,
+    bestStreak: 0,
+    todayProgress: 0,
+    totalAchievements: 6, // Initialize with total count
+    unlockedAchievements: 0,
+    weeklyGoal: 80,
+    weeklyProgress: 0,
+  });
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [wellnessInsights, setWellnessInsights] = useState<WellnessInsight[]>(
+    [],
+  );
+  const [showAchievements, setShowAchievements] = useState(false);
 
   const {
     usageData,
@@ -55,12 +77,55 @@ const InsightsScreen = () => {
       }),
     ]).start();
 
-    loadInsights();
+    console.log('🔄 InsightsScreen useEffect triggered:', {
+      usageDataLength: usageData.length,
+      hasUsageData: usageData.length > 0,
+    });
+
+    if (usageData.length > 0) {
+      console.log('📊 Loading wellness data...');
+      loadWellnessData();
+    } else {
+      console.log('⚠️ No usage data available yet');
+    }
   }, [usageData]);
 
   // Load usage data on mount
   useEffect(() => {
     loadUsageData(7, () => setHasLoadedOnce(true)); // Load 7 days for the graph
+  }, []);
+
+  // Initialize wellness service even without usage data
+  useEffect(() => {
+    const initializeWellness = async () => {
+      try {
+        const wellnessService = WellnessService.getInstance();
+
+        // Get initial achievements (even if empty)
+        const achievementList = wellnessService.getAchievements();
+        setAchievements(achievementList);
+
+        console.log('🎯 Wellness service initialized:', {
+          achievements: achievementList.length,
+          achievementList: achievementList.map(a => ({
+            id: a.id,
+            unlocked: a.unlocked,
+            progress: a.progress,
+          })),
+        });
+
+        // Update stats with current achievement count
+        setWellnessStats(prev => ({
+          ...prev,
+          totalAchievements: achievementList.length,
+          unlockedAchievements: achievementList.filter(a => a.unlocked).length,
+        }));
+      } catch (error) {
+        console.log('Error initializing wellness service:', error);
+      }
+    };
+
+    initializeWellness();
   }, []);
 
   // Periodic refresh to check for real data availability (silent refresh)
@@ -169,14 +234,31 @@ const InsightsScreen = () => {
     }
   };
 
-  const loadInsights = async () => {
+  const loadWellnessData = async () => {
     try {
-      const appUsageService = AppUsageService.getInstance();
-      const healthInsights =
-        await appUsageService.getHealthAndProductivityInsights();
-      setInsights(healthInsights);
+      const wellnessService = WellnessService.getInstance();
+
+      // Update wellness stats
+      const stats = await wellnessService.updateStats(usageData);
+      setWellnessStats(stats);
+
+      // Get achievements
+      const achievementList = wellnessService.getAchievements();
+      setAchievements(achievementList);
+
+      // Generate insights
+      const wellnessInsightList = await wellnessService.generateInsights(
+        usageData,
+      );
+      setWellnessInsights(wellnessInsightList);
+
+      console.log('🎯 Wellness data loaded:', {
+        stats,
+        achievements: achievementList.length,
+        insights: wellnessInsightList.length,
+      });
     } catch (error) {
-      console.log('Error loading insights:', error);
+      console.log('Error loading wellness data:', error);
     }
   };
 
@@ -439,14 +521,24 @@ const InsightsScreen = () => {
           </View>
         </View>
 
-        {/* No refresh indicator - we want seamless updates */}
-
         {/* Usage Graph with enhanced styling */}
         {categoryData.length > 0 && (
           <View style={styles.graphSection}>
             <UsageGraph data={usageData} />
           </View>
         )}
+
+        {/* No refresh indicator - we want seamless updates */}
+
+        {/* Wellness Streak - Gamified Component */}
+        <WellnessStreak
+          currentStreak={wellnessStats.currentStreak}
+          bestStreak={wellnessStats.bestStreak}
+          todayProgress={wellnessStats.todayProgress}
+          unlockedAchievements={wellnessStats.unlockedAchievements}
+          totalAchievements={wellnessStats.totalAchievements}
+          onPress={() => setShowAchievements(true)}
+        />
 
         {/* Enhanced Empty State */}
         {processedUsageData.length === 0 && !loading && (
@@ -729,6 +821,33 @@ const InsightsScreen = () => {
           </View>
         )}
 
+        {/* Wellness Insights */}
+        {wellnessInsights.length > 0 && (
+          <View style={styles.insightsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Today's Insights</Text>
+              <Text style={styles.sectionSubtitle}>
+                Personalized recommendations
+              </Text>
+            </View>
+            {wellnessInsights.slice(0, 3).map(insight => (
+              <InsightCard
+                key={insight.id}
+                title={insight.title}
+                description={insight.description}
+                icon={insight.icon}
+                color={insight.color}
+                type={insight.type}
+                actionText={insight.actionText}
+                onActionPress={() => {
+                  // Handle insight action
+                  console.log('Insight action pressed:', insight.id);
+                }}
+              />
+            ))}
+          </View>
+        )}
+
         {/* Enhanced Insights */}
         {insights?.digitalWellbeing?.recommendations && (
           <View style={styles.insightsCard}>
@@ -779,6 +898,39 @@ const InsightsScreen = () => {
         isVisible={showPrivacyInfo}
         onClose={() => setShowPrivacyInfo(false)}
       />
+
+      {/* Achievements Modal */}
+      {showAchievements && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.achievementsModal}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>🏆 Achievements</Text>
+              <TouchableOpacity
+                onPress={() => setShowAchievements(false)}
+                style={styles.closeButton}
+              >
+                <Icon name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              style={styles.achievementsList}
+              showsVerticalScrollIndicator={false}
+            >
+              {achievements.map(achievement => (
+                <AchievementCard
+                  key={achievement.id}
+                  achievement={achievement}
+                  onPress={() => {
+                    // Handle achievement press
+                    console.log('Achievement pressed:', achievement.id);
+                  }}
+                />
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      )}
     </Animated.View>
   );
 };
@@ -855,6 +1007,66 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
+  insightsSection: {
+    marginBottom: 24,
+    marginHorizontal: 16,
+  },
+  sectionHeader: {
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  achievementsModal: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    margin: 20,
+    maxHeight: '80%',
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
+    paddingBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  achievementsList: {
+    padding: 20,
+  },
   headerIcon: {
     width: 56,
     height: 56,
@@ -869,11 +1081,12 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   graphSection: {
-    marginBottom: 8,
+    marginBottom: 16,
   },
   wellnessCard: {
     backgroundColor: '#FFFFFF',
-    margin: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
     padding: 24,
     borderRadius: 24,
     shadowColor: '#000',
@@ -965,7 +1178,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 16,
     gap: 12,
-    marginBottom: 8,
+    marginBottom: 16,
   },
   statCard: {
     flex: 1,
@@ -1017,7 +1230,8 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     backgroundColor: '#FFFFFF',
-    margin: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
     padding: 24,
     borderRadius: 24,
     shadowColor: '#000',
@@ -1103,7 +1317,8 @@ const styles = StyleSheet.create({
   },
   appsCard: {
     backgroundColor: '#FFFFFF',
-    margin: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
     padding: 24,
     borderRadius: 24,
     shadowColor: '#000',
