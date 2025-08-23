@@ -15,12 +15,14 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAppUsage } from '../hooks/useAppUsage';
 import AppUsageService from '../services/AppUsageService';
 import UsageGraph from '../components/UsageGraph';
+import PrivacyInfo from '../components/PrivacyInfo';
 
 const { width } = Dimensions.get('window');
 
 const InsightsScreen = () => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
+  const [showPrivacyInfo, setShowPrivacyInfo] = useState(false);
 
   const {
     usageData,
@@ -126,18 +128,25 @@ const InsightsScreen = () => {
         }, 2000); // Wait 2 seconds for system to update
       } else {
         Alert.alert(
-          'Permissions Required',
-          `To get accurate screen time and phone usage data, this app needs:\n\n` +
-            `📱 **Phone Usage Tracking** - Monitor screen time and app usage\n\n` +
-            `These permissions help us provide:\n` +
-            `• Accurate screen time tracking\n` +
-            `• Usage pattern analysis\n` +
-            `• Digital wellness insights\n` +
-            `• Personalized recommendations\n\n` +
-            `Your data stays private and is stored only on your device.`,
+          '🔒 Privacy-First Permission Request',
+          `ZenFlow needs access to your app usage data to provide personalized wellness insights.\n\n` +
+            `📱 **What we need:**\n` +
+            `• App usage statistics (which apps you use and for how long)\n\n` +
+            `🛡️ **Your Privacy is Protected:**\n` +
+            `✅ **100% Local Storage** - All data stays on your device\n` +
+            `✅ **No Internet Required** - Works completely offline\n` +
+            `✅ **No Data Sharing** - We never see your personal data\n` +
+            `✅ **No Analytics** - Your usage patterns stay private\n` +
+            `✅ **No Cloud Storage** - Nothing is uploaded to servers\n\n` +
+            `🎯 **What you get:**\n` +
+            `• Personalized wellness insights\n` +
+            `• Screen time analysis\n` +
+            `• Digital wellbeing recommendations\n` +
+            `• Usage pattern tracking\n\n` +
+            `Your data is processed locally and never leaves your device.`,
           [
-            { text: 'Cancel' },
-            { text: 'Open Settings', onPress: openDeviceSettings },
+            { text: 'Cancel', style: 'cancel' },
+            { text: '🔒 Grant Permission', onPress: openDeviceSettings },
           ],
         );
       }
@@ -412,31 +421,6 @@ const InsightsScreen = () => {
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Permission Banner */}
-        {permissionStatus && !permissionStatus.hasPermissions && (
-          <Animated.View
-            style={[styles.permissionBanner, { opacity: fadeAnim }]}
-          >
-            <View style={styles.permissionContent}>
-              <View style={styles.permissionIconContainer}>
-                <Icon name="shield-lock" size={24} color="#F59E0B" />
-              </View>
-              <View style={styles.permissionTextContainer}>
-                <Text style={styles.permissionTitle}>Setup Required</Text>
-                <Text style={styles.permissionText}>
-                  Enable usage tracking for personalized insights
-                </Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={styles.permissionButton}
-              onPress={handleRequestPermissions}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.permissionButtonText}>Enable Now</Text>
-              <Icon name="chevron-right" size={16} color="#FFFFFF" />
-            </TouchableOpacity>
-          </Animated.View>
-        )}
 
         {/* Enhanced Header */}
         <View style={styles.header}>
@@ -451,13 +435,62 @@ const InsightsScreen = () => {
             <View style={styles.headerIcon}>
               <Icon name="leaf" size={28} color="#FFFFFF" />
             </View>
+            <TouchableOpacity
+              style={styles.privacyInfoButton}
+              onPress={() => setShowPrivacyInfo(true)}
+              activeOpacity={0.7}
+            >
+              <Icon name="shield-information" size={20} color="#6366F1" />
+            </TouchableOpacity>
           </View>
         </View>
 
         {/* Usage Graph with enhanced styling */}
-        <View style={styles.graphSection}>
-          <UsageGraph data={usageData} />
-        </View>
+        {categoryData.length > 0 && (
+          <View style={styles.graphSection}>
+            <UsageGraph data={usageData} />
+          </View>
+        )}
+
+        {/* Enhanced Empty State */}
+        {processedUsageData.length === 0 && !loading && (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIconContainer}>
+              <Icon name="chart-line-variant" size={80} color="#E5E7EB" />
+            </View>
+            <Text style={styles.emptyTitle}>No Usage Data Yet</Text>
+            <Text style={styles.emptySubtitle}>
+              Enable phone usage tracking to unlock your digital wellness
+              insights and start your mindful journey
+            </Text>
+
+            {/* Privacy Assurance */}
+            <View style={styles.privacyAssurance}>
+              <Icon name="shield-check" size={16} color="#10B981" />
+              <Text style={styles.privacyAssuranceText}>
+                Your data stays 100% private on your device
+              </Text>
+            </View>
+
+            {permissionStatus && !permissionStatus.hasPermissions && (
+              <TouchableOpacity
+                style={styles.enableButton}
+                onPress={handleRequestPermissions}
+                activeOpacity={0.8}
+              >
+                <Icon
+                  name="shield-lock"
+                  size={20}
+                  color="#FFFFFF"
+                  style={{ marginRight: 8 }}
+                />
+                <Text style={styles.enableButtonText}>
+                  🔒 Start Private Tracking
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
         {/* Enhanced Wellness Score Card */}
         {totalUsage > 0 && (
@@ -741,38 +774,15 @@ const InsightsScreen = () => {
           </View>
         )}
 
-        {/* Enhanced Empty State */}
-        {processedUsageData.length === 0 && !loading && (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconContainer}>
-              <Icon name="chart-line-variant" size={80} color="#E5E7EB" />
-            </View>
-            <Text style={styles.emptyTitle}>No Usage Data Yet</Text>
-            <Text style={styles.emptySubtitle}>
-              Enable phone usage tracking to unlock your digital wellness
-              insights and start your mindful journey
-            </Text>
-            {permissionStatus && !permissionStatus.hasPermissions && (
-              <TouchableOpacity
-                style={styles.enableButton}
-                onPress={handleRequestPermissions}
-                activeOpacity={0.8}
-              >
-                <Icon
-                  name="trending-up"
-                  size={20}
-                  color="#FFFFFF"
-                  style={{ marginRight: 8 }}
-                />
-                <Text style={styles.enableButtonText}>Start Tracking</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
+
+      {/* Privacy Info Modal */}
+      <PrivacyInfo
+        isVisible={showPrivacyInfo}
+        onClose={() => setShowPrivacyInfo(false)}
+      />
     </Animated.View>
   );
 };
@@ -828,6 +838,22 @@ const styles = StyleSheet.create({
   },
   headerIconContainer: {
     marginLeft: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  privacyInfoButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   headerIcon: {
     width: 56,
@@ -1333,6 +1359,22 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  privacyAssurance: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F0FDF4',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 24,
+    gap: 8,
+  },
+  privacyAssuranceText: {
+    fontSize: 14,
+    color: '#10B981',
+    fontWeight: '500',
   },
   bottomSpacing: {
     height: 32,
