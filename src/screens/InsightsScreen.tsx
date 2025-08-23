@@ -16,6 +16,8 @@ import { useAppUsage } from '../hooks/useAppUsage';
 import AppUsageService from '../services/AppUsageService';
 import UsageGraph from '../components/UsageGraph';
 import PrivacyInfo from '../components/PrivacyInfo';
+import InsightsShimmer from '../components/InsightsShimmer';
+import ShimmerLoader from '../components/ShimmerLoader';
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +25,8 @@ const InsightsScreen = () => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
   const [showPrivacyInfo, setShowPrivacyInfo] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   const {
     usageData,
@@ -31,6 +35,7 @@ const InsightsScreen = () => {
     checkPermissions,
     loading,
     loadUsageData,
+    silentRefreshData,
   } = useAppUsage();
   const [insights, setInsights] = useState<any>(null);
   const [permissionStatus, setPermissionStatus] = useState<any>(null);
@@ -55,24 +60,25 @@ const InsightsScreen = () => {
 
   // Load usage data on mount
   useEffect(() => {
-    loadUsageData(7); // Load 7 days for the graph
+    loadUsageData(7, () => setHasLoadedOnce(true)); // Load 7 days for the graph
   }, []);
 
-  // Periodic refresh to check for real data availability
+  // Periodic refresh to check for real data availability (silent refresh)
   useEffect(() => {
-    if (permissionStatus?.hasPermissions) {
+    if (permissionStatus?.hasPermissions && hasLoadedOnce) {
       const interval = setInterval(async () => {
         try {
-          console.log('🔄 Periodic refresh checking for real data...');
-          await loadUsageData(7);
+          console.log('🔄 Silent refresh checking for real data...');
+          // Silent refresh - don't show loading state
+          await silentRefreshData(7);
         } catch (error) {
-          console.error('❌ Error in periodic refresh:', error);
+          console.error('❌ Error in silent refresh:', error);
         }
       }, 30000); // Check every 30 seconds
 
       return () => clearInterval(interval);
     }
-  }, [permissionStatus?.hasPermissions]);
+  }, [permissionStatus?.hasPermissions, hasLoadedOnce, silentRefreshData]);
 
   // Check permissions on mount
   useEffect(() => {
@@ -393,20 +399,8 @@ const InsightsScreen = () => {
 
   const timeGreeting = getTimeGreeting();
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Animated.View style={{ opacity: fadeAnim }}>
-            <Icon name="leaf" size={64} color="#10B981" />
-            <Text style={styles.loadingText}>
-              Analyzing your digital wellbeing...
-            </Text>
-            <Text style={styles.loadingSubtext}>This might take a moment</Text>
-          </Animated.View>
-        </View>
-      </View>
-    );
+  if (loading && !hasLoadedOnce) {
+    return <InsightsShimmer />;
   }
 
   return (
@@ -444,6 +438,8 @@ const InsightsScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* No refresh indicator - we want seamless updates */}
 
         {/* Usage Graph with enhanced styling */}
         {categoryData.length > 0 && (
@@ -854,6 +850,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+  },
+  refreshIndicator: {
+    alignItems: 'center',
+    marginBottom: 16,
   },
   headerIcon: {
     width: 56,

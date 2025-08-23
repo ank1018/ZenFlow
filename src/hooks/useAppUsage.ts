@@ -50,25 +50,40 @@ export const useAppUsage = () => {
     }
   }, []);
 
-  const loadUsageData = useCallback(async (days: number = 7) => {
+  const loadUsageData = useCallback(
+    async (days: number = 7, onComplete?: () => void) => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log(`📱 Loading ${days} days of usage data...`);
+        const data = await appUsageService.getAppUsageForPeriod(days);
+        console.log(`📱 Received ${data.length} data points`);
+        const totalUsage = data.reduce((sum, item) => sum + item.usageTime, 0);
+        console.log(
+          `📱 Total usage in data: ${totalUsage} minutes (${(
+            totalUsage / 60
+          ).toFixed(1)} hours)`,
+        );
+        setUsageData(data);
+        if (onComplete) onComplete();
+      } catch (err) {
+        setError('Failed to load usage data');
+        console.error('Error loading usage data:', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  const silentRefreshData = useCallback(async (days: number = 7) => {
     try {
-      setLoading(true);
-      setError(null);
-      console.log(`📱 Loading ${days} days of usage data...`);
+      console.log(`📱 Silent refresh of ${days} days of usage data...`);
       const data = await appUsageService.getAppUsageForPeriod(days);
-      console.log(`📱 Received ${data.length} data points`);
-      const totalUsage = data.reduce((sum, item) => sum + item.usageTime, 0);
-      console.log(
-        `📱 Total usage in data: ${totalUsage} minutes (${(
-          totalUsage / 60
-        ).toFixed(1)} hours)`,
-      );
+      console.log(`📱 Silent refresh received ${data.length} data points`);
       setUsageData(data);
     } catch (err) {
-      setError('Failed to load usage data');
-      console.error('Error loading usage data:', err);
-    } finally {
-      setLoading(false);
+      console.error('Error in silent refresh:', err);
     }
   }, []);
 
@@ -151,6 +166,7 @@ export const useAppUsage = () => {
     startTracking,
     stopTracking,
     loadUsageData,
+    silentRefreshData,
     loadInsights,
     getPhoneUsageImpact,
     requestPermissions,
