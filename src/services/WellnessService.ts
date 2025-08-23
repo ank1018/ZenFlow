@@ -110,16 +110,16 @@ class WellnessService {
         maxProgress: 5,
         unlocked: false,
       },
-    //   {
-    //     id: 'focus_time',
-    //     title: 'Focus Champion',
-    //     description: 'Complete 10 focused work sessions',
-    //     icon: 'target',
-    //     color: '#EF4444',
-    //     progress: 0,
-    //     maxProgress: 10,
-    //     unlocked: false,
-    //   },
+      //   {
+      //     id: 'focus_time',
+      //     title: 'Focus Champion',
+      //     description: 'Complete 10 focused work sessions',
+      //     icon: 'target',
+      //     color: '#EF4444',
+      //     progress: 0,
+      //     maxProgress: 10,
+      //     unlocked: false,
+      //   },
     ];
   }
 
@@ -494,6 +494,7 @@ class WellnessService {
         icon: 'eye-off',
         color: '#F59E0B',
         type: 'warning',
+        actionText: 'Get Tips',
         priority: 1,
       });
     }
@@ -508,6 +509,7 @@ class WellnessService {
         icon: 'star',
         color: '#10B981',
         type: 'achievement',
+        actionText: 'View Details',
         priority: 2,
       });
     }
@@ -521,6 +523,7 @@ class WellnessService {
         icon: 'fire',
         color: '#EF4444',
         type: 'achievement',
+        actionText: 'Celebrate',
         priority: 3,
       });
     }

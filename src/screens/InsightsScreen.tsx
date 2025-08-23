@@ -59,6 +59,130 @@ const InsightsScreen = () => {
     loadUsageData,
     silentRefreshData,
   } = useAppUsage();
+
+  // Handle insight actions
+  const handleInsightAction = (insight: WellnessInsight) => {
+    console.log('🎯 Insight action pressed:', insight.id);
+
+    switch (insight.id) {
+      case 'high_usage_warning':
+        Alert.alert(
+          'High Screen Time Alert',
+          'Here are some tips to reduce screen time:\n\n• Set app time limits\n• Use Do Not Disturb mode\n• Take regular breaks\n• Enable grayscale mode\n• Use focus mode',
+          [
+            { text: 'Got it', style: 'default' },
+            { text: 'Set Reminder', onPress: () => setScreenTimeReminder() },
+          ],
+        );
+        break;
+
+      case 'productivity_tip':
+        Alert.alert(
+          'Productivity Tips',
+          'Boost your digital wellness:\n\n• Use productivity apps like Forest\n• Set specific work hours\n• Batch similar tasks together\n• Use website blockers\n• Track your progress',
+          [
+            { text: 'Thanks', style: 'default' },
+            { text: 'View Apps', onPress: () => showProductivityApps() },
+          ],
+        );
+        break;
+
+      case 'evening_usage_tip':
+        Alert.alert(
+          'Evening Digital Detox',
+          'Improve your sleep quality:\n\n• Set a "bedtime" for your phone\n• Use night mode/blue light filter\n• Keep phone away from bed\n• Read a book instead\n• Practice relaxation techniques',
+          [
+            { text: 'Got it', style: 'default' },
+            // { text: 'Set Bedtime', onPress: () => setBedtimeReminder() },
+          ],
+        );
+        break;
+
+      case 'good_progress':
+        Alert.alert(
+          'Excellent Progress! 🎉',
+          "You're doing great with your digital wellness!\n\nKeep up these habits:\n• Regular breaks\n• Mindful usage\n• Balanced screen time\n• Quality over quantity",
+          [{ text: 'Continue Great Work!', style: 'default' }],
+        );
+        break;
+
+      case 'streak_milestone':
+        Alert.alert(
+          'Streak Milestone! 🔥',
+          `Congratulations! You've maintained mindful usage for ${
+            insight.description.split(' ')[2]
+          } days!\n\nReward yourself and keep the momentum going!`,
+          [{ text: 'Keep Going!', style: 'default' }],
+        );
+        break;
+
+      default:
+        Alert.alert('Insight', insight.description, [
+          { text: 'OK', style: 'default' },
+        ]);
+    }
+  };
+
+  // Helper functions for insight actions
+  const setScreenTimeReminder = () => {
+    Alert.alert(
+      'Screen Time Reminder',
+      'Would you like to set a daily reminder to check your screen time?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Set Reminder',
+          onPress: () => {
+            // TODO: Implement actual reminder setting
+            Alert.alert(
+              'Reminder Set',
+              "You'll get a daily reminder to check your screen time!",
+            );
+          },
+        },
+      ],
+    );
+  };
+
+  const showProductivityApps = () => {
+    Alert.alert(
+      'Productivity Apps',
+      'Recommended productivity apps:\n\n• Forest - Focus Timer\n• Freedom - Website Blocker\n• RescueTime - Time Tracking\n• Cold Turkey - Distraction Blocker\n• Be Focused - Pomodoro Timer',
+      [
+        { text: 'Thanks', style: 'default' },
+        {
+          text: 'Learn More',
+          onPress: () => {
+            // TODO: Open app store or website
+            Alert.alert(
+              'Coming Soon',
+              'App recommendations will be available soon!',
+            );
+          },
+        },
+      ],
+    );
+  };
+
+  const setBedtimeReminder = () => {
+    Alert.alert(
+      'Bedtime Reminder',
+      'Would you like to set a bedtime reminder to put your phone away?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        // {
+        //   text: 'Set Bedtime',
+        //   onPress: () => {
+        //     // TODO: Implement actual bedtime reminder
+        //     Alert.alert(
+        //       'Bedtime Set',
+        //       "You'll get a reminder to put your phone away before bed!",
+        //     );
+        //   },
+        // },
+      ],
+    );
+  };
   const [insights, setInsights] = useState<any>(null);
   const [permissionStatus, setPermissionStatus] = useState<any>(null);
 
@@ -839,10 +963,7 @@ const InsightsScreen = () => {
                 color={insight.color}
                 type={insight.type}
                 actionText={insight.actionText}
-                onActionPress={() => {
-                  // Handle insight action
-                  console.log('Insight action pressed:', insight.id);
-                }}
+                onActionPress={() => handleInsightAction(insight)}
               />
             ))}
           </View>
