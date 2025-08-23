@@ -124,21 +124,10 @@ class WellnessService {
   }
 
   async updateStats(usageData: AppUsageData[]): Promise<WellnessStats> {
-    console.log('🎯 WellnessService.updateStats called with:', {
-      usageDataLength: usageData.length,
-      sampleData: usageData.slice(0, 2),
-    });
-
     const today = new Date().toISOString().split('T')[0];
     const todayData = usageData.filter(
       item => new Date(item.date).toISOString().split('T')[0] === today,
     );
-
-    console.log('📅 Today data:', {
-      today,
-      todayDataLength: todayData.length,
-      todayData: todayData.slice(0, 2),
-    });
 
     // Calculate today's progress
     const totalUsage = todayData.reduce((sum, item) => sum + item.usageTime, 0);
@@ -149,12 +138,6 @@ class WellnessService {
     this.stats.todayProgress =
       totalUsage > 0 ? Math.round((healthyUsage / totalUsage) * 100) : 0;
 
-    console.log('📊 Usage calculation:', {
-      totalUsage,
-      healthyUsage,
-      todayProgress: this.stats.todayProgress,
-    });
-
     // Calculate streak
     this.calculateStreak(usageData);
 
@@ -163,8 +146,6 @@ class WellnessService {
 
     // Calculate weekly progress
     this.calculateWeeklyProgress(usageData);
-
-    // console.log removed
 
     return this.stats;
   }
@@ -184,15 +165,12 @@ class WellnessService {
       .sort()
       .reverse();
 
-    // console.log removed
-
     let currentStreak = 0;
     let bestStreak = this.stats.bestStreak;
     const today = new Date().toISOString().split('T')[0];
 
     // Check if we have data for today
     const hasTodayData = dates.includes(today);
-    // console.log removed
 
     for (const date of dates) {
       const dayData = usageData.filter(
@@ -207,28 +185,15 @@ class WellnessService {
       const wellnessScore =
         totalUsage > 0 ? (healthyUsage / totalUsage) * 100 : 0;
 
-      console.log(
-        `📊 Date: ${date}, Total: ${totalUsage}min, Healthy: ${healthyUsage}min, Score: ${wellnessScore.toFixed(
-          1,
-        )}%`,
-      );
-
       // For streak calculation, we need at least some usage data
       if (totalUsage > 0) {
         if (wellnessScore >= 60) {
           currentStreak++;
           bestStreak = Math.max(bestStreak, currentStreak);
-          // console.log removed
         } else {
-          console.log(
-            `❌ Streak broken: Score ${wellnessScore.toFixed(1)}% < 60%`,
-          );
           break;
         }
       } else {
-        console.log(
-          `⚠️ No usage data for ${date}, skipping streak calculation`,
-        );
         // Don't break streak for days with no data, just skip
         continue;
       }
@@ -236,15 +201,10 @@ class WellnessService {
 
     // If we don't have today's data, don't count today in the streak
     if (!hasTodayData && currentStreak > 0) {
-      // console.log removed
     }
 
     this.stats.currentStreak = currentStreak;
     this.stats.bestStreak = bestStreak;
-
-    console.log(
-      `🏆 Final streak: Current=${currentStreak}, Best=${bestStreak}`,
-    );
   }
 
   private async updateAchievements(usageData: AppUsageData[]) {
@@ -255,8 +215,6 @@ class WellnessService {
         usageData.map(item => new Date(item.date).toISOString().split('T')[0]),
       ),
     ].sort();
-
-    // console.log removed
 
     // First day achievement
     const firstDayAchievement = this.achievements.find(
@@ -270,7 +228,6 @@ class WellnessService {
       firstDayAchievement.progress = 1;
       firstDayAchievement.unlocked = true;
       firstDayAchievement.unlockedDate = new Date().toLocaleDateString();
-      // console.log removed
     }
 
     // Week streak achievement
@@ -285,7 +242,6 @@ class WellnessService {
       ) {
         weekStreakAchievement.unlocked = true;
         weekStreakAchievement.unlockedDate = new Date().toLocaleDateString();
-        // console.log removed
       }
     }
 
@@ -304,11 +260,7 @@ class WellnessService {
           0,
         );
         const isLowUsage = totalUsage <= 240; // 4 hours in minutes
-        console.log(
-          `📱 ${date}: ${totalUsage}min (${(totalUsage / 60).toFixed(
-            1,
-          )}h) - Low usage: ${isLowUsage}`,
-        );
+
         return isLowUsage;
       }).length;
 
@@ -316,7 +268,6 @@ class WellnessService {
       if (lowUsageAchievement.progress >= 7 && !lowUsageAchievement.unlocked) {
         lowUsageAchievement.unlocked = true;
         lowUsageAchievement.unlockedDate = new Date().toLocaleDateString();
-        // console.log removed
       }
     }
 
@@ -340,11 +291,7 @@ class WellnessService {
         const productivityScore =
           totalUsage > 0 ? (productiveUsage / totalUsage) * 100 : 0;
         const isProductive = productivityScore >= 80;
-        console.log(
-          `💼 ${date}: ${productivityScore.toFixed(
-            1,
-          )}% productive - Achievement: ${isProductive}`,
-        );
+
         return isProductive;
       }).length;
 
@@ -355,7 +302,6 @@ class WellnessService {
       ) {
         productivityAchievement.unlocked = true;
         productivityAchievement.unlockedDate = new Date().toLocaleDateString();
-        // console.log removed
       }
     }
 
@@ -364,10 +310,6 @@ class WellnessService {
     this.stats.unlockedAchievements = this.achievements.filter(
       a => a.unlocked,
     ).length;
-
-    console.log(
-      `🏆 Achievement progress: ${this.stats.unlockedAchievements}/${this.stats.totalAchievements} unlocked`,
-    );
   }
 
   private calculateWeeklyProgress(usageData: AppUsageData[]) {

@@ -70,20 +70,9 @@ const SleepScreen: React.FC = () => {
   const [averageSleep, setAverageSleep] = useState(0);
   const [phoneUsageInsights, setPhoneUsageInsights] = useState<any>(null);
 
-  console.log(
-    'SleepScreen: loading',
-    loading,
-    'error',
-    error,
-    'latestSleep',
-    latestSleep,
-  );
-
   const loadPeriodData = async () => {
     const days = selectedPeriod === 'week' ? 7 : 30;
     const periodSleepData = await getSleepDataForPeriod(days);
-
-    // console.log removed
 
     // Convert to hours for display
     const hoursData = periodSleepData.map(data => data.duration / 60);
@@ -106,7 +95,6 @@ const SleepScreen: React.FC = () => {
       const healthInsights =
         await appUsageService.getHealthAndProductivityInsights();
       setPhoneUsageInsights(healthInsights);
-      // console.log removed
     } catch (error) {
       console.error('Error loading phone usage insights:', error);
     }
@@ -125,10 +113,6 @@ const SleepScreen: React.FC = () => {
   useEffect(() => {
     if (!isTracking) {
       startTracking().catch(error => {
-        console.log(
-          'Phone usage tracking not available, using fallback mode:',
-          error,
-        );
         // Don't show error to user, just continue with fallback
       });
     }
@@ -565,8 +549,6 @@ const SleepScreen: React.FC = () => {
 
     const maxHours = periodData.length > 0 ? Math.max(...periodData) : 8;
     const sleepGoal = settings?.sleepGoal || 8;
-
-    // console.log removed
 
     return (
       <View style={styles.chartContainer}>

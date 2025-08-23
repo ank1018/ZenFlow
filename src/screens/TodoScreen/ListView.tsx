@@ -42,13 +42,6 @@ export const ListView: React.FC<{
     // Debug logging
     useEffect(() => {
       if (nextTask) {
-        console.log('📅 Next task found:', {
-          title: nextTask.title,
-          startTime: nextTask.startAt,
-          timeUntil: nextTask.startAt
-            ? new Date(nextTask.startAt).getTime() - new Date().getTime()
-            : 'N/A',
-        });
       }
     }, [nextTask]);
 

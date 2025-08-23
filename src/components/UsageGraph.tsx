@@ -72,18 +72,6 @@ const UsageGraph: React.FC<UsageGraphProps> = ({ data }) => {
       0,
     );
     const avgProcessedDaily = totalProcessedUsage / sortedData.length;
-    console.log(
-      `📊 Processed ${
-        sortedData.length
-      } days with total usage: ${totalProcessedUsage} minutes (${(
-        totalProcessedUsage / 60
-      ).toFixed(1)} hours)`,
-    );
-    console.log(
-      `📊 Average processed daily: ${avgProcessedDaily.toFixed(1)} minutes (${(
-        avgProcessedDaily / 60
-      ).toFixed(1)} hours)`,
-    );
 
     return sortedData.slice(-7); // Show last 7 days
   }, [data]);

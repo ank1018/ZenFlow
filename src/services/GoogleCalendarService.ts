@@ -15,12 +15,6 @@ class GoogleCalendarService {
   async initialize() {
     if (this.isInitialized) return;
 
-    // console.log removed
-    console.log('📱 Native modules check:', {
-      hasCalendarNative,
-      hasGoogleSigninNative,
-    });
-
     // ---- Calendar module presence
     if (!hasCalendarNative) {
       console.warn(
@@ -40,7 +34,6 @@ class GoogleCalendarService {
           if (status !== 'authorized') {
             console.warn('⚠️ Calendar permission not granted');
           } else {
-            // console.log removed
           }
         }
 
@@ -57,10 +50,6 @@ class GoogleCalendarService {
             const writeOk =
               results[PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR] ===
               PermissionsAndroid.RESULTS.GRANTED;
-            console.log('📅 Android calendar permissions:', {
-              readOk,
-              writeOk,
-            });
           } catch (permError) {
             console.warn('⚠️ Android permission request failed:', permError);
           }
@@ -96,7 +85,6 @@ class GoogleCalendarService {
 
         GoogleSignin.configure(config);
         this.googleSignInAvailable = true;
-        // console.log removed
       } else {
         this.googleSignInAvailable = false;
         console.warn(
@@ -109,7 +97,6 @@ class GoogleCalendarService {
     }
 
     this.isInitialized = true;
-    // console.log removed
   }
 
   async isSignedIn() {
@@ -144,9 +131,7 @@ class GoogleCalendarService {
       if (user && GoogleSignin.getTokens) {
         const tokens = await GoogleSignin.getTokens();
         this.accessToken = tokens.accessToken;
-        // console.log removed
       } else {
-        // console.log removed
       }
       return !!user;
     } catch (e) {
@@ -156,7 +141,6 @@ class GoogleCalendarService {
         Platform.OS === 'android' &&
         (e as any)?.message?.includes('iosClientId')
       ) {
-        // console.log removed
         return true;
       }
       return false;
@@ -173,7 +157,7 @@ class GoogleCalendarService {
     try {
       await GoogleSignin.signOut?.();
       this.accessToken = null;
-      // console.log removed
+
       return true;
     } catch (e) {
       console.warn('⚠️ Sign-out error:', e);
@@ -195,7 +179,6 @@ class GoogleCalendarService {
         if (user && GoogleSignin.getTokens) {
           const tokens = await GoogleSignin.getTokens();
           this.accessToken = tokens.accessToken;
-          // console.log removed
         } else {
           console.warn('⚠️ No access token available');
           return [];
@@ -234,9 +217,7 @@ class GoogleCalendarService {
       }
 
       const data = await response.json();
-      console.log(
-        `📅 Fetched ${data.items?.length || 0} Google Calendar events`,
-      );
+
       return data.items || [];
     } catch (e) {
       console.warn('⚠️ Error fetching Google Calendar events:', e);
@@ -253,7 +234,6 @@ class GoogleCalendarService {
 
     try {
       const events = await this.getGoogleCalendarEvents();
-      // console.log removed
 
       return events.map((event: any) => {
         // Parse start and end times

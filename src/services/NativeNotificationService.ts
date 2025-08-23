@@ -48,22 +48,13 @@ class NativeNotificationService {
     triggerTime: Date,
   ): Promise<boolean> {
     try {
-      console.log('🔔 Native scheduling notification:', {
-        id: notificationId,
-        title,
-        message,
-        triggerTime: triggerTime.toISOString(),
-        triggerTimeMs: triggerTime.getTime(),
-      });
-      
       const result = await this.module.scheduleNotification(
         notificationId,
         title,
         message,
         triggerTime.getTime(),
       );
-      
-      // console.log removed
+
       return result;
     } catch (error) {
       console.error('❌ Error scheduling notification:', error);

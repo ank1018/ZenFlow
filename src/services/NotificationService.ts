@@ -110,22 +110,15 @@ class NotificationService {
    */
   async scheduleTaskNotifications(task: Todo) {
     try {
-      // console.log removed
-
       if (!task.startAt) {
-        // console.log removed
         return;
       }
 
       const startTime = new Date(task.startAt);
       const now = new Date();
 
-      // console.log removed
-      // console.log removed
-
       // Don't schedule notifications for past tasks
       if (startTime <= now) {
-        // console.log removed
         return;
       }
 
@@ -134,10 +127,8 @@ class NotificationService {
 
       // Schedule 10-minute reminder (10 minutes BEFORE task starts)
       const tenMinBefore = new Date(startTime.getTime() - 10 * 60 * 1000);
-      // console.log removed
 
       if (tenMinBefore > now) {
-        // console.log removed
         // Use native notification service for reliable scheduling
         const result10min = await this.scheduleNativeNotification(
           `${task.id}_10min`,
@@ -145,17 +136,13 @@ class NotificationService {
           `Your task "${task.title}" starts in 10 minutes`,
           tenMinBefore,
         );
-        // console.log removed
       } else {
-        // console.log removed
       }
 
       // Schedule 1-minute reminder (1 minute BEFORE task starts)
       const oneMinBefore = new Date(startTime.getTime() - 1 * 60 * 1000);
-      // console.log removed
 
       if (oneMinBefore > now) {
-        // console.log removed
         // Use native notification service for reliable scheduling
         const result1min = await this.scheduleNativeNotification(
           `${task.id}_1min`,
@@ -163,9 +150,7 @@ class NotificationService {
           `Your task "${task.title}" starts in 1 minute!`,
           oneMinBefore,
         );
-        // console.log removed
       } else {
-        // console.log removed
       }
     } catch (error) {
       console.error('❌ Error scheduling task notifications:', error);
@@ -274,19 +259,9 @@ class NotificationService {
    */
   async scheduleMultipleTaskNotifications(tasks: Todo[]) {
     try {
-      // console.log removed
-
       // Log Google Calendar tasks specifically
       const calendarTasks = tasks.filter(task => task.isFromCalendar);
       if (calendarTasks.length > 0) {
-        console.log(
-          `📅 Processing ${calendarTasks.length} Google Calendar tasks:`,
-          calendarTasks.map(t => ({
-            title: t.title,
-            startAt: t.startAt,
-            calendarEventId: t.calendarEventId,
-          })),
-        );
       }
 
       for (const task of tasks) {
@@ -350,15 +325,12 @@ class NotificationService {
    */
   async testNotification() {
     try {
-      // console.log removed
-
       // Test immediate notification
       const immediateResult =
         await NativeNotificationService.showCustomNotification(
           'Test Notification',
           'This is a test notification from ZenFlow',
         );
-      // console.log removed
 
       // Test scheduled notification (1 minute from now)
       const testTime = new Date(Date.now() + 60000); // 1 minute from now
@@ -368,7 +340,6 @@ class NotificationService {
         'This is a test scheduled notification from ZenFlow',
         testTime,
       );
-      // console.log removed
 
       return { immediateResult, scheduledResult };
     } catch (error) {

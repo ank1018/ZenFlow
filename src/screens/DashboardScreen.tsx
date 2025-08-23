@@ -49,11 +49,9 @@ const DashboardScreen: React.FC = () => {
       try {
         const status =
           await AppUsageService.getInstance().checkPermissionsStatus();
-        // console.log removed
+
         setPermissionStatus(status);
-      } catch (error) {
-        // console.log removed
-      }
+      } catch (error) {}
     };
     checkPermissions();
   }, []);
@@ -62,10 +60,6 @@ const DashboardScreen: React.FC = () => {
   useEffect(() => {
     if (!isTracking) {
       startTracking().catch(error => {
-        console.log(
-          'Phone usage tracking not available, using fallback mode:',
-          error,
-        );
         // Don't show error to user, just continue with fallback
       });
     }
@@ -74,64 +68,28 @@ const DashboardScreen: React.FC = () => {
   // Comprehensive logging of all available data
   useEffect(() => {
     const logAllAvailableData = async () => {
-      // console.log removed
-
       try {
         const appUsageService = AppUsageService.getInstance();
 
         // 1. Log permission status
-        // console.log removed
 
         // 2. Log raw app usage data
-        // console.log removed
+
         const rawUsageData = await appUsageService.getAppUsageForPeriod(1);
-        // console.log removed
 
         // 3. Log phone usage impact
-        // console.log removed
+
         const phoneImpact = await appUsageService.getPhoneUsageImpact();
-        // console.log removed
 
         // 4. Log app usage insights
-        // console.log removed
+
         const insights = await appUsageService.getAppUsageInsights();
-        // console.log removed
 
         // 5. Log current tracking status
-        console.log('🎯 TRACKING STATUS:', {
-          isTracking,
-          usageDataLength: usageData?.length || 0,
-          currentUsageData: usageData,
-        });
 
         // 6. Log all available data sources
-        console.log('📋 ALL AVAILABLE DATA SOURCES:', {
-          userStats: stats,
-          todos: todos,
-          timerSessions: { todayFocusTime },
-          sleepData: { latestSleep },
-          appUsage: usageData,
-          permissionStatus,
-        });
 
         // 7. Log data quality assessment
-        console.log('🔍 DATA QUALITY ASSESSMENT:', {
-          hasRealData:
-            rawUsageData.length > 0 &&
-            !rawUsageData[0]?.appName?.includes('WhatsApp'), // Check if it's not demo data
-          dataSource:
-            rawUsageData.length > 0 ? 'Real Android Usage Stats' : 'Demo Data',
-          permissionGranted: permissionStatus?.hasPermissions || false,
-          trackingActive: isTracking,
-          dataCompleteness: {
-            appUsage: rawUsageData.length,
-            sleepData: latestSleep ? 'Available' : 'Not Available',
-            timerData: todayFocusTime > 0 ? 'Available' : 'Not Available',
-            todoData: todos.length,
-          },
-        });
-
-        // console.log removed
       } catch (error) {
         console.error('❌ Error logging comprehensive data:', error);
       }
@@ -315,7 +273,6 @@ const DashboardScreen: React.FC = () => {
 
   // Manual permission test for debugging
   const testPermissionRequest = async () => {
-    // console.log removed
     try {
       const appUsageService = AppUsageService.getInstance();
 
@@ -538,10 +495,6 @@ const DashboardScreen: React.FC = () => {
                   { backgroundColor: '#10b981', marginTop: 5 },
                 ]}
                 onPress={() => {
-                  console.log(
-                    '🔍 Current Permission Status:',
-                    permissionStatus,
-                  );
                   Alert.alert(
                     'Current Status',
                     `hasPermissions: ${permissionStatus?.hasPermissions}\n` +

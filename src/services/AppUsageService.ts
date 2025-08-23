@@ -51,11 +51,7 @@ class AppUsageService {
   // Check if we're in a production build
   private isProductionBuild(): boolean {
     const isProduction = !__DEV__;
-    console.log('🔍 Production Build Detection:', {
-      __DEV__,
-      isProduction,
-      platform: Platform.OS,
-    });
+
     return isProduction;
   }
 
@@ -68,19 +64,13 @@ class AppUsageService {
     isProduction: boolean;
   }> {
     const isProduction = this.isProductionBuild();
-    // console.log removed
 
     if (Platform.OS === 'android') {
       try {
-        // console.log removed
         const hasUsageStatsPermission =
           await AppUsageModule.checkUsageStatsPermission();
 
         this.hasPermissions = hasUsageStatsPermission;
-        console.log(
-          '🔍 Usage stats permission result:',
-          hasUsageStatsPermission,
-        );
 
         return {
           hasPermissions: hasUsageStatsPermission,
@@ -102,7 +92,7 @@ class AppUsageService {
     }
 
     // iOS - would need Screen Time API
-    // console.log removed
+
     return {
       hasPermissions: false,
       needsPermissions: false,
@@ -116,7 +106,6 @@ class AppUsageService {
   async requestPermissions(): Promise<boolean> {
     if (Platform.OS === 'android') {
       try {
-        // console.log removed
         await AppUsageModule.requestUsageStatsPermission();
 
         // Wait a moment for user to grant permission
@@ -126,7 +115,6 @@ class AppUsageService {
         const hasPermission = await AppUsageModule.checkUsageStatsPermission();
         this.hasPermissions = hasPermission;
 
-        // console.log removed
         return hasPermission;
       } catch (error) {
         console.error('❌ Permission request failed:', error);
@@ -134,7 +122,6 @@ class AppUsageService {
       }
     }
 
-    // console.log removed
     return false;
   }
 
@@ -145,24 +132,15 @@ class AppUsageService {
     try {
       if (Platform.OS === 'android') {
         // Always check current permission status first
-        console.log(
-          '🔍 Checking current permission status before starting tracking...',
-        );
         const permissionStatus = await this.checkPermissionsStatus();
 
         if (!permissionStatus.hasPermissions) {
-          // console.log removed
           throw new Error('Usage statistics permission not granted');
         }
 
-        console.log(
-          '🔍 Permissions confirmed, starting real app usage tracking...',
-        );
         await AppUsageModule.startUsageTracking();
         this.isTracking = true;
-        // console.log removed
       } else {
-        // console.log removed
         throw new Error('Platform not supported');
       }
     } catch (error) {
@@ -182,13 +160,10 @@ class AppUsageService {
     }
 
     this.isTracking = false;
-    // console.log removed
   }
 
   // Get app usage data for a period
   async getAppUsageForPeriod(days: number = 7): Promise<AppUsageData[]> {
-    // console.log removed
-
     // Check cache first
     const cacheKey = `usage_data_${days}`;
     const now = Date.now();
@@ -197,7 +172,6 @@ class AppUsageService {
       this.dataCache.has(cacheKey) &&
       now - this.lastCacheUpdate < this.CACHE_DURATION
     ) {
-      // console.log removed
       return this.dataCache.get(cacheKey)!;
     }
 
@@ -206,20 +180,14 @@ class AppUsageService {
       const permissionStatus = await this.checkPermissionsStatus();
 
       if (!permissionStatus.hasPermissions) {
-        // console.log removed
         return [];
       }
 
       try {
-        // console.log removed
         const usageStats = await AppUsageModule.getUsageStats(days);
-        // console.log removed
 
         // Check if we have real usage data
         if (usageStats.length === 0) {
-          console.log(
-            '🔍 No real usage data available yet, using sample data temporarily',
-          );
           const sampleData = this.generateSampleData(days);
           this.cacheData(cacheKey, sampleData);
           return sampleData;
@@ -229,12 +197,6 @@ class AppUsageService {
         const processedData = await this.processUsageDataConsistently(
           usageStats,
           days,
-        );
-
-        console.log(
-          '🔍 Processed real usage data:',
-          processedData.length,
-          'items',
         );
 
         // Cache the processed data
@@ -247,7 +209,6 @@ class AppUsageService {
       }
     }
 
-    // console.log removed
     return [];
   }
 
@@ -255,7 +216,6 @@ class AppUsageService {
   private cacheData(key: string, data: AppUsageData[]): void {
     this.dataCache.set(key, data);
     this.lastCacheUpdate = Date.now();
-    // console.log removed
   }
 
   // Process usage data consistently without random variations
@@ -266,21 +226,6 @@ class AppUsageService {
     const processedData: AppUsageData[] = [];
     const now = new Date();
 
-    console.log('🔍 Processing usage stats:', {
-      statsCount: usageStats.length,
-      days: days,
-      sampleStat: usageStats[0]
-        ? {
-            packageName: usageStats[0].packageName,
-            appName: usageStats[0].appName,
-            usageTime: usageStats[0].usageTime,
-            usageTimeMinutes: Math.round(usageStats[0].usageTime / 60000),
-            firstTimeStamp: new Date(usageStats[0].firstTimeStamp),
-            lastTimeStamp: new Date(usageStats[0].lastTimeStamp),
-          }
-        : null,
-    });
-
     // Create a consistent seed based on the date and app package names
     const seed = this.generateConsistentSeed(usageStats, days);
 
@@ -289,14 +234,6 @@ class AppUsageService {
     usageStats.forEach((stat: any) => {
       uniqueApps.set(stat.packageName, stat);
     });
-
-    console.log(
-      '🔍 Unique apps found:',
-      uniqueApps.size,
-      'out of',
-      usageStats.length,
-      'total stats',
-    );
 
     // Generate realistic daily usage patterns
     for (let i = 0; i < days; i++) {
@@ -335,12 +272,6 @@ class AppUsageService {
           dailyTotal += dailyUsageTime;
         }
       });
-
-      console.log(
-        `📅 Day ${i} (${
-          date.toISOString().split('T')[0]
-        }): ${dailyTotal} minutes (${(dailyTotal / 60).toFixed(1)} hours)`,
-      );
     }
 
     // Log daily totals for verification
@@ -349,16 +280,6 @@ class AppUsageService {
       const dateKey = item.date.toISOString().split('T')[0];
       const currentTotal = dailyTotals.get(dateKey) || 0;
       dailyTotals.set(dateKey, currentTotal + item.usageTime);
-    });
-
-    // console.log removed
-    console.log('🔍 Processed daily data:', {
-      totalItems: processedData.length,
-      sampleItems: processedData.slice(0, 3).map(item => ({
-        date: item.date.toISOString().split('T')[0],
-        app: item.appName,
-        usage: item.usageTime,
-      })),
     });
 
     return processedData;
@@ -578,8 +499,6 @@ class AppUsageService {
 
   // Generate sample data for testing and fallback
   private generateSampleData(days: number): AppUsageData[] {
-    // console.log removed
-
     const sampleApps = [
       { name: 'ZenFlow', package: 'com.zenflow', category: 'health' as const },
       {
@@ -655,7 +574,6 @@ class AppUsageService {
       });
     }
 
-    // console.log removed
     return data;
   }
 
@@ -729,7 +647,6 @@ class AppUsageService {
   public clearCache(): void {
     this.dataCache.clear();
     this.lastCacheUpdate = 0;
-    // console.log removed
   }
 
   // Force refresh data (clear cache and get fresh data)
@@ -741,12 +658,6 @@ class AppUsageService {
   // Get phone usage impact on sleep
   async getPhoneUsageImpact(): Promise<PhoneUsageImpact> {
     const usageData = await this.getAppUsageForPeriod(1);
-
-    // console.log removed
-    console.log(
-      '📱 Input usage data for impact calculation:',
-      JSON.stringify(usageData, null, 2),
-    );
 
     if (usageData.length > 0) {
       // Calculate real impact based on usage data
@@ -765,22 +676,6 @@ class AppUsageService {
         notifications: Math.floor(Math.random() * 8) + 3, // Simulate for now
       };
 
-      console.log('🌙 PHONE USAGE IMPACT CALCULATION:', {
-        totalUsageMinutes: totalUsage,
-        socialAppsCount: socialApps.length,
-        socialTimeMinutes: socialTime,
-        calculatedImpact: impact,
-        calculationDetails: {
-          beforeBed: `min(${socialTime}, 60) = ${impact.beforeBed}`,
-          afterWake: `min(${totalUsage} * 0.3, 45) = min(${
-            totalUsage * 0.3
-          }, 45) = ${impact.afterWake}`,
-          blueLightExposure: `min(${socialTime} + ${totalUsage} * 0.2, 90) = min(${
-            socialTime + totalUsage * 0.2
-          }, 90) = ${impact.blueLightExposure}`,
-        },
-      });
-
       return impact;
     }
 
@@ -793,10 +688,6 @@ class AppUsageService {
       notifications: 0,
     };
 
-    console.log(
-      '📱 No usage data available, returning defaults:',
-      defaultImpact,
-    );
     return defaultImpact;
   }
 
@@ -809,12 +700,6 @@ class AppUsageService {
     entertainmentTime: number;
   }> {
     const usageData = await this.getAppUsageForPeriod(1);
-
-    // console.log removed
-    console.log(
-      '📱 Input usage data for insights:',
-      JSON.stringify(usageData, null, 2),
-    );
 
     if (usageData.length > 0) {
       const totalScreenTime = usageData.reduce(
@@ -850,33 +735,6 @@ class AppUsageService {
         entertainmentTime,
       };
 
-      console.log('📊 APP USAGE INSIGHTS CALCULATION:', {
-        totalScreenTime,
-        mostUsedApp,
-        productivityScore,
-        socialMediaTime,
-        entertainmentTime,
-        productivityTime,
-        calculationDetails: {
-          productivityScore: `${productivityTime} / ${totalScreenTime} * 100 = ${productivityScore}%`,
-          categoryBreakdown: {
-            social: usageData
-              .filter(app => app.category === 'social')
-              .map(app => ({ name: app.appName, time: app.usageTime })),
-            entertainment: usageData
-              .filter(app => app.category === 'entertainment')
-              .map(app => ({ name: app.appName, time: app.usageTime })),
-            productivity: usageData
-              .filter(app => app.category === 'productivity')
-              .map(app => ({ name: app.appName, time: app.usageTime })),
-            health: usageData
-              .filter(app => app.category === 'health')
-              .map(app => ({ name: app.appName, time: app.usageTime })),
-            insights,
-          },
-        },
-      });
-
       return insights;
     }
 
@@ -889,10 +747,6 @@ class AppUsageService {
       entertainmentTime: 0,
     };
 
-    console.log(
-      '📱 No usage data available, returning defaults:',
-      defaultInsights,
-    );
     return defaultInsights;
   }
 
@@ -937,15 +791,6 @@ class AppUsageService {
     const usageData = await this.getAppUsageForPeriod(7); // Get 7 days of data
     const todayData = await this.getAppUsageForPeriod(1);
 
-    // console.log removed
-    console.log(
-      '📊 Input data - 7 days:',
-      usageData.length,
-      'apps, Today:',
-      todayData.length,
-      'apps',
-    );
-
     // Calculate sleep health metrics
     const sleepHealth = this.calculateSleepHealth(usageData, todayData);
 
@@ -972,10 +817,6 @@ class AppUsageService {
       weeklyTrends,
     };
 
-    console.log(
-      '🧠 COMPREHENSIVE HEALTH INSIGHTS:',
-      JSON.stringify(insights, null, 2),
-    );
     return insights;
   }
 

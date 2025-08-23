@@ -28,12 +28,12 @@ export const useAppUsage = () => {
         setIsTracking(true);
       } else {
         // Don't automatically request permissions, just log
-        // console.log removed
+
         setIsTracking(false);
       }
     } catch (err) {
       // Don't set error for permission issues, just log them
-      // console.log removed
+
       setIsTracking(true);
     } finally {
       setLoading(false);
@@ -55,15 +55,11 @@ export const useAppUsage = () => {
       try {
         setLoading(true);
         setError(null);
-        // console.log removed
+
         const data = await appUsageService.getAppUsageForPeriod(days);
-        // console.log removed
+
         const totalUsage = data.reduce((sum, item) => sum + item.usageTime, 0);
-        console.log(
-          `📱 Total usage in data: ${totalUsage} minutes (${(
-            totalUsage / 60
-          ).toFixed(1)} hours)`,
-        );
+
         setUsageData(data);
         if (onComplete) onComplete();
       } catch (err) {
@@ -78,9 +74,8 @@ export const useAppUsage = () => {
 
   const silentRefreshData = useCallback(async (days: number = 7) => {
     try {
-      // console.log removed
       const data = await appUsageService.getAppUsageForPeriod(days);
-      // console.log removed
+
       setUsageData(data);
     } catch (err) {
       console.error('Error in silent refresh:', err);

@@ -694,11 +694,6 @@ const TodoScreen: React.FC = () => {
     }
 
     const endTime = performance.now();
-    console.log(
-      `⚡ Filtered and sorted ${result.length} todos in ${(
-        endTime - startTime
-      ).toFixed(2)}ms`,
-    );
 
     return result;
   }, [todos, filter, viewMode]);

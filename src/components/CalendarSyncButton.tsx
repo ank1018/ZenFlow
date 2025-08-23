@@ -47,20 +47,11 @@ const CalendarSyncButton: React.FC = () => {
           try {
             const calendarEvents =
               await GoogleCalendarService.syncGoogleCalendarToTodos();
-            console.log(
-              `📅 Fetched ${calendarEvents.length} calendar events after sign-in`,
-            );
 
             if (calendarEvents.length > 0) {
               const syncedCount = await syncWithGoogleCalendar(calendarEvents);
-              console.log(
-                `✅ Post-sign-in sync complete: ${syncedCount} events synced`,
-              );
 
               // Log the sync completion and force refresh
-              console.log(
-                `📊 Current todos count in CalendarSyncButton: ${todos.length}`,
-              );
 
               // Single refresh after sign-in sync
               setTimeout(() => {
@@ -91,9 +82,6 @@ const CalendarSyncButton: React.FC = () => {
 
       const calendarEvents =
         await GoogleCalendarService.syncGoogleCalendarToTodos();
-      console.log(
-        `📅 Fetched ${calendarEvents.length} calendar events for sync`,
-      );
 
       if (calendarEvents.length > 0) {
         const syncedCount = await syncWithGoogleCalendar(calendarEvents);
@@ -103,9 +91,6 @@ const CalendarSyncButton: React.FC = () => {
         );
 
         // Log the sync completion and force refresh
-        console.log(
-          `📊 Current todos count in CalendarSyncButton: ${todos.length}`,
-        );
 
         // Force refresh to ensure TodoScreen gets updated state
         setTimeout(() => {
