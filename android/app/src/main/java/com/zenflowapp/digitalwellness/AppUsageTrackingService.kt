@@ -1,4 +1,4 @@
-package com.zenflow
+package com.zenflowapp.digitalwellness
 
 import android.app.Notification
 import android.app.NotificationChannel

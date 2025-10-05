@@ -1,4 +1,4 @@
-package com.zenflow
+package com.zenflowapp.digitalwellness
 
 import android.app.AppOpsManager
 import android.content.Context

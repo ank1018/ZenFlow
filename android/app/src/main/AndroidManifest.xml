@@ -2,7 +2,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -64,7 +63,7 @@
         </service>
         
         <receiver
-            android:name="com.zenflow.NotificationAlarmReceiver"
+            android:name="com.zenflowapp.digitalwellness.NotificationAlarmReceiver"
             android:exported="false" />
 
       <!-- Local notification receiver -->

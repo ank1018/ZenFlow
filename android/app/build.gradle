@@ -78,9 +78,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.zenflow"
+    namespace "com.zenflowapp.digitalwellness"
     defaultConfig {
-        applicationId "com.zenflow"
+        applicationId "com.zenflowapp.digitalwellness"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2
